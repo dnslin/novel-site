@@ -8,16 +8,23 @@ export async function createConnection() {
   if (db) return db;
 
   try {
+    console.log("Opening database connection...");
+    const dbPath = path.resolve(process.cwd(), "books.db");
+    console.log("Database path:", dbPath);
+
     db = await open({
-      filename: path.resolve(process.cwd(), "book.db"),
+      filename: dbPath,
       driver: sqlite3.Database,
     });
 
-    console.log("Database connected successfully");
+    console.log("Testing database connection...");
+    const test = await db.get("SELECT 1 as test");
+    console.log("Database connection test result:", test);
+
     return db;
   } catch (error) {
     console.error("Database connection error:", error);
-    process.exit(1);
+    throw error;
   }
 }
 

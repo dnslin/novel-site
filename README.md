@@ -9,15 +9,15 @@ Vue.js + Vite + typescript+ Pnpm + pinia + axios + koa + sqlite + TailwindCSS + 
 ```bash
 novel-site/
 ├── package.json
-├── vite.config.js
-├── index.js           # Koa 入口文件
+├── vite.config.ts
+├── index.ts           # Koa 入口文件
 ├── src/
 │   ├── client/       # 前端 Vue 代码
 │   │   ├── App.vue
-│   │   ├── main.js
+│   │   ├── main.ts
 │   │   ├── components/
 │   │   └── views/
-│   └── server/       # 后端 Koa 代码
+│   └── server/       # 后端  代码
 │       ├── routes/
 │       ├── models/
 │       └── middleware/

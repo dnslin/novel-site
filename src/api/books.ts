@@ -1,5 +1,5 @@
 import instance from "./instance";
-import type { Book, BookDetail, BookQuery, PaginatedData } from "@client/types";
+import type { Book, BookDetail, BookQuery, PaginatedData } from "@/types";
 
 export const bookApi = {
   // 获取书籍列表

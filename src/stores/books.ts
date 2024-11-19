@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { bookApi } from "@client/api";
-import type { Book } from "@client/types";
+import type { Book } from "@/types";
 
 interface BookState {
   latestBooks: Book[];

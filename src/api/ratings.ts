@@ -1,5 +1,5 @@
 import instance from "./instance";
-import type { RatingType, CreateRatingParams } from "@client/types";
+import type { RatingType, CreateRatingParams } from "@/types";
 
 export const ratingApi = {
   // 获取评分类型列表

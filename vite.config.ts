@@ -10,7 +10,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@client": path.resolve(__dirname, "./src/client"),
     },
   },
   build: {

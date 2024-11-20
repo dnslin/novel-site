@@ -10,6 +10,17 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@client": path.resolve(__dirname, "./src/client"),
+    },
+  },
+  server: {
+    proxy: {
+      // 配置代理
+      "/api": {
+        target: "http://localhost:8100/v1", // 后端服务地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""), // 移除 /api 前缀
+      },
     },
   },
   build: {

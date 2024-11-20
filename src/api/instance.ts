@@ -13,7 +13,7 @@ const instance = axios.create({
 instance.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse;
-    if (res.code !== 200) {
+    if (res.code !== 0) {
       // 统一错误处理
       console.error(res.message || "请求失败");
       return Promise.reject(new Error(res.message || "请求失败"));

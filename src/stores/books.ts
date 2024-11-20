@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { bookApi } from "@client/api";
-import type { Book } from "@/types";
+import { bookApi } from "@/api";
+import type { Book, BookDetail } from "@/types";
 
 interface BookState {
   latestBooks: Book[];
@@ -36,10 +36,9 @@ export const useBookStore = defineStore("books", {
       try {
         const data = await bookApi.getBooks({
           page: 1,
-          limit: 6,
-          sort: "created_at",
+          page_size: 6,
         });
-        this.latestBooks = data.list;
+        this.latestBooks = data.items;
       } catch (error: any) {
         this.error = error.message;
         console.error("获取最新书籍失败:", error);
@@ -54,10 +53,9 @@ export const useBookStore = defineStore("books", {
       try {
         const data = await bookApi.getBooks({
           page: 1,
-          limit: 6,
-          sort: "rating",
+          page_size: 6,
         });
-        this.popularBooks = data.list;
+        this.popularBooks = data.items;
       } catch (error: any) {
         this.error = error.message;
         console.error("获取热门书籍失败:", error);
@@ -71,11 +69,26 @@ export const useBookStore = defineStore("books", {
       this.error = null;
       try {
         const data = await bookApi.searchBooks(keyword);
-        return data.list;
+        return data.items;
       } catch (error: any) {
         this.error = error.message;
         console.error("搜索书籍失败:", error);
         return [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getBookDetail(id: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await bookApi.getBookDetail(id);
+        return data;
+      } catch (error: any) {
+        this.error = error.message;
+        console.error("获取书籍详情失败:", error);
+        throw error;
       } finally {
         this.loading = false;
       }

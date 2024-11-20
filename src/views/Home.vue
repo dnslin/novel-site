@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ChevronRightIcon, BookOpenIcon, FireIcon } from '@heroicons/vue/24/outline'
-import { useBookStore } from '../stores/books'
+import { useBookStore } from '@/stores/books'
 import { storeToRefs } from 'pinia'
-import type { Book } from '../types/book'
+import type { Book } from '@/types'
 
 const bookStore = useBookStore()
 const { latestBooks, popularBooks, categories, loading } = storeToRefs(bookStore)
@@ -89,6 +89,11 @@ onMounted(async () => {
                             <div class="p-3">
                                 <h3 class="font-medium text-sm mb-1 truncate">{{ book.title }}</h3>
                                 <p class="text-xs text-gray-500 truncate">{{ book.author }}</p>
+                                <div class="mt-1 flex items-center text-xs">
+                                    <span class="text-primary">{{ book.sort }}</span>
+                                    <span class="mx-1">·</span>
+                                    <span class="text-gray-400">{{ book.tag }}</span>
+                                </div>
                             </div>
                         </div>
                     </template>

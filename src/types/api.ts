@@ -1,19 +1,17 @@
 // API 相关类型定义
 export interface ApiResponse<T = any> {
   code: number;
-  message?: string;
+  message: string;
   data: T;
 }
 
 // 分页相关类型
 export interface PaginationQuery {
   page?: number;
-  limit?: number;
+  page_size?: number;
 }
 
-export interface PaginatedData<T> {
-  list: T[];
+export interface PaginatedResponse<T> {
   total: number;
-  page: number;
-  limit: number;
+  items: T[];
 }

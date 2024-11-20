@@ -11,7 +11,7 @@
   </router-view>
 </template>
 
-<style scoped>
+<style>
 /* 全局样式 */
 body {
   @apply antialiased text-gray-800;

@@ -1,0 +1,61 @@
+/* 在全局样式文件中定义 CSS 变量 */
+:root {
+    /* 主题颜色 */
+    --primary-color: #4338CA;
+    --secondary-color: #3B82F6;
+    
+    /* 其他全局变量... */
+    --scrollbar-track: #f3f4f6;
+    --scrollbar-thumb: #d1d5db;
+}
+
+/* 深色模式变量 */
+:root.dark {
+    --primary-color: #312E81;
+    --secondary-color: #1E3A8A;
+    
+    /* 其他深色模式变量... */
+    --scrollbar-track: #1f2937;
+    --scrollbar-thumb: #4b5563;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+* {
+    /* Firefox */
+    scrollbar-width: none;
+}
+
+/* Chrome, Safari, Edge */
+*::-webkit-scrollbar {
+    display: none;
+}
+
+/* IE */
+* {
+    -ms-overflow-style: none;
+}
+
+/* 确保页面仍然可以滚动 */
+html, body {
+    overflow-y: auto;
+}
+
+/* 可选：在特定容器中使用自定义滚动条 */
+.custom-scrollbar {
+  @apply overflow-auto;
+  /* 在需要的地方添加这个类名 */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  @apply w-1.5;  /* 更窄的滚动条 */
+}
+
+/* 可选：隐藏滚动条但保持滚动功能 */
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+} 

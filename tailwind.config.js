@@ -4,24 +4,59 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: '#4F46E5',  // 主题色
-        secondary: '#6B7280',  // 次要色
+        primary: {
+          light: '#818CF8',
+          DEFAULT: '#4F46E5',
+          dark: '#4338CA',
+        },
+        secondary: {
+          light: '#60A5FA',
+          DEFAULT: '#3B82F6',
+          dark: '#2563EB',
+        }
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-in': 'slideIn 0.5s ease-out',
+        'gradient-x': 'gradient-x 15s ease infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'gradient': 'gradient 15s ease infinite',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          },
         },
-        slideIn: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'slideUp': {
+          '0%': {
+            transform: 'translateY(20px)',
+            opacity: '0'
+          },
+          '100%': {
+            transform: 'translateY(0)',
+            opacity: '1'
+          },
+        },
+        gradient: {
+          '0%, 100%': {
+            'background-position': '0% 50%'
+          },
+          '50%': {
+            'background-position': '100% 50%'
+          },
         },
       },
     },

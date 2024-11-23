@@ -20,4 +20,9 @@ export const bookApi = {
       page_size: 10,
     });
   },
+
+  // 添加获取分类接口
+  getBookSorts() {
+    return instance.get<never, { sorts: string[] }>("/books/sorts");
+  },
 };

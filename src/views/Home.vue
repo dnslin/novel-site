@@ -5,10 +5,10 @@ import { ChevronRightIcon, BookOpenIcon, FireIcon, MoonIcon, SunIcon } from '@he
 import { useBookStore } from '@/stores/books'
 import { storeToRefs } from 'pinia'
 import type { Book } from '@/types'
-
 const { theme, toggleTheme } = useTheme()
 const bookStore = useBookStore()
 const { latestBooks, popularBooks, categories, loading } = storeToRefs(bookStore)
+
 
 // 搜索相关
 const searchKeyword = ref('')
@@ -52,7 +52,8 @@ const typeWriter = (text: string, displayRef: Ref<string>, speed: number = 100):
 onMounted(async () => {
     await Promise.all([
         bookStore.fetchLatestBooks(),
-        bookStore.fetchPopularBooks()
+        bookStore.fetchPopularBooks(),
+        bookStore.fetchCategories(),
     ])
 
     // 先显示主标题
@@ -78,13 +79,17 @@ onMounted(async () => {
         <!-- 顶部横幅区域 -->
         <header class="relative">
             <div class="hero-section py-24">
-                <!-- 添加背景图层 -->
-                <div class="absolute inset-0 w-full h-full">
-                    <img src="@/assets/blob-scene-haikei.svg" alt="background" class="w-full h-full object-cover" />
+                <!-- 背景图层 - 使用计算属性动态切换背景图 -->
+                <div class="absolute inset-0 w-full h-full transition-opacity duration-500">
+                    <!-- 白天模式背景图 -->
+                    <img src="@/assets/blob-scene-light.svg" alt="background"
+                        class="w-full h-full object-cover transition-opacity duration-500"
+                        :class="{ 'opacity-0': isDark, 'opacity-100': !isDark }" />
+                    <!-- 黑夜模式背景图 -->
+                    <img src="@/assets/blob-scene-black.svg" alt="background"
+                        class="w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-500"
+                        :class="{ 'opacity-100': isDark, 'opacity-0': !isDark }" />
                 </div>
-
-                <!-- 添加渐变遮罩 -->
-                <div class="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
 
                 <!-- 内容区域 -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -101,12 +106,24 @@ onMounted(async () => {
 
                     <!-- 搜索框 -->
                     <div class="max-w-2xl mx-auto relative animate-search">
-                        <input type="text" v-model="searchKeyword" @keyup.enter="handleSearch" class="w-full pl-6 pr-12 py-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 
-                            text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-primary/50
-                            dark:bg-gray-800/50 dark:border-gray-700/50" placeholder="搜索你感兴趣的书籍、作者..." />
-                        <button @click="handleSearch"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <input type="text" v-model="searchKeyword" @keyup.enter="handleSearch" class="w-full pl-6 pr-12 py-4 rounded-full 
+                                   transition-colors duration-300
+                                   border
+                                   focus:outline-none focus:ring-2
+                                   placeholder:transition-colors
+                                   dark:placeholder:text-gray-400
+                                   dark:text-white text-gray-700
+                                   bg-white/20 dark:bg-gray-900/20
+                                   backdrop-blur-sm
+                                   border-white/30 dark:border-gray-600/30
+                                   focus:ring-primary/50 dark:focus:ring-primary-light/50
+                                   placeholder:text-gray-600" placeholder="搜索你感兴趣的书籍、作者..." />
+                        <button @click="handleSearch" class="absolute right-4 top-1/2 -translate-y-1/2 
+                                   transition-colors duration-300
+                                   text-gray-600 dark:text-gray-400 
+                                   hover:text-primary dark:hover:text-primary-light">
+                            <svg class="w-6 h-6 transition-transform duration-300 hover:scale-110" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -119,16 +136,84 @@ onMounted(async () => {
         <!-- 主要内容区 -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
             <!-- 分类导航 -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-                <router-link v-for="category in categories" :key="category.name" :to="`/category/${category.name}`"
-                    class="relative overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                    <div
-                        class="relative h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-primary/5 to-primary/20 dark:from-primary/10 dark:to-primary/30">
-                        <span class="text-3xl mb-3 transform group-hover:scale-110 transition-transform duration-300">
-                            {{ category.icon }}
-                        </span>
-                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12 px-2">
+                <router-link v-for="category in bookStore.hotCategories" :key="category.name"
+                    :to="`/category/${category.name}`" class="group relative overflow-hidden rounded-2xl 
+                           bg-gradient-to-br from-white to-gray-50 
+                           dark:from-gray-800/80 dark:to-gray-800/40 
+                           shadow-sm hover:shadow-xl 
+                           border border-gray-200/80 dark:border-gray-700/30
+                           transition-all duration-500 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-br 
+                                from-primary/5 via-primary/2 to-primary/10 
+                                dark:from-primary/10 dark:to-primary/20 
+                                opacity-0 group-hover:opacity-100 
+                                transition-opacity duration-500">
+                    </div>
+
+                    <div class="relative h-full flex flex-col items-center justify-center p-6 
+                                group-hover:transform group-hover:scale-105 
+                                transition-transform duration-500">
+                        <!-- 图标容器 -->
+                        <div class="relative mb-3 transform-gpu transition-all duration-500 ease-out 
+                                    group-hover:scale-110">
+                            <div class="absolute inset-0 bg-primary/20 
+                                        dark:bg-primary/30 rounded-full 
+                                        blur-lg scale-75 opacity-0 
+                                        group-hover:opacity-70 
+                                        transition-all duration-500">
+                            </div>
+                            <img :src="category.icon" :alt="category.name"
+                                class="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:rotate-6" />
+                        </div>
+
+                        <!-- 分类名称 -->
+                        <span class="text-sm font-medium 
+                                     text-gray-700 dark:text-gray-200
+                                     group-hover:text-primary dark:group-hover:text-primary-light 
+                                     transition-colors duration-500">
                             {{ category.name }}
+                        </span>
+                    </div>
+                </router-link>
+
+                <!-- "更多分类"按钮 -->
+                <router-link to="/categories" class="group relative overflow-hidden rounded-2xl 
+                           bg-gradient-to-br from-primary/5 to-transparent 
+                           dark:from-primary/20 dark:to-primary/5
+                           shadow-sm hover:shadow-xl 
+                           border border-primary/30 dark:border-primary/40
+                           transition-all duration-500 ease-out">
+                    <div class="absolute inset-0 bg-gradient-to-br 
+                                from-primary/10 via-primary/5 to-primary/15 
+                                dark:from-primary/20 dark:to-primary/30 
+                                opacity-0 group-hover:opacity-100 
+                                transition-opacity duration-500">
+                    </div>
+
+                    <div class="relative h-full flex flex-col items-center justify-center p-6 
+                                group-hover:transform group-hover:scale-105 
+                                transition-transform duration-500">
+                        <!-- 图标容器 -->
+                        <div class="relative mb-3 transform-gpu transition-all duration-500 ease-out 
+                                    group-hover:scale-110">
+                            <div class="absolute inset-0 bg-primary/30 
+                                        dark:bg-primary/40 rounded-full 
+                                        blur-lg scale-75 opacity-0 
+                                        group-hover:opacity-70 
+                                        transition-all duration-500">
+                            </div>
+                            <img src="@/assets/svg/更多.svg" alt="更多分类"
+                                class="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:rotate-12" />
+                        </div>
+
+                        <!-- "更多分类"文字 -->
+                        <span class="text-sm font-medium text-primary-dark 
+                                     dark:text-primary-light
+                                     group-hover:text-primary-darker 
+                                     dark:group-hover:text-primary-lighter 
+                                     transition-colors duration-500">
+                            更多分类
                         </span>
                     </div>
                 </router-link>
@@ -276,6 +361,7 @@ p.typewriter-container {
 
 .hero-section img {
     animation: subtle-move 20s ease-in-out infinite;
+    transition: opacity 0.5s ease;
 }
 
 /* 确保文字在深色背景上清晰可见 */

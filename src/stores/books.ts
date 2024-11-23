@@ -1,6 +1,30 @@
 import { defineStore } from "pinia";
 import { bookApi } from "@/api";
-import type { Book, BookDetail } from "@/types";
+import type { Book } from "@/types";
+
+// 定义分类图标映射
+const SORT_ICONS: Record<string, string> = {
+  悬疑: new URL("@/assets/svg/悬疑.svg", import.meta.url).href,
+  科幻: new URL("@/assets/svg/科幻.svg", import.meta.url).href,
+  历史: new URL("@/assets/svg/历史.svg", import.meta.url).href,
+  文学: new URL("@/assets/svg/文学.svg", import.meta.url).href,
+  玄幻: new URL("@/assets/svg/玄幻.svg", import.meta.url).href,
+  都市: new URL("@/assets/svg/现代都市.svg", import.meta.url).href,
+  体育: new URL("@/assets/svg/体育.svg", import.meta.url).href,
+  游戏: new URL("@/assets/svg/游戏.svg", import.meta.url).href,
+  武侠: new URL("@/assets/svg/武侠.svg", import.meta.url).href,
+  仙侠: new URL("@/assets/svg/仙侠.svg", import.meta.url).href,
+  军事: new URL("@/assets/svg/军事.svg", import.meta.url).href,
+  奇幻: new URL("@/assets/svg/奇幻.svg", import.meta.url).href,
+  现代言情: new URL("@/assets/svg/现代言情.svg", import.meta.url).href,
+  游戏竞技: new URL("@/assets/svg/竞技.svg", import.meta.url).href,
+  古代言情: new URL("@/assets/svg/古代言情.svg", import.meta.url).href,
+  浪漫青春: new URL("@/assets/svg/浪漫青春.svg", import.meta.url).href,
+  传记: new URL("@/assets/svg/传记.svg", import.meta.url).href,
+  修真玄幻: new URL("@/assets/svg/修真玄幻.svg", import.meta.url).href,
+  玄幻言情: new URL("@/assets/svg/玄幻言情.svg", import.meta.url).href,
+  穿越: new URL("@/assets/svg/穿越.svg", import.meta.url).href,
+};
 
 interface BookState {
   latestBooks: Book[];
@@ -9,6 +33,7 @@ interface BookState {
     name: string;
     icon: string;
   }>;
+  allCategories: string[];
   loading: boolean;
   error: string | null;
 }
@@ -17,19 +42,40 @@ export const useBookStore = defineStore("books", {
   state: (): BookState => ({
     latestBooks: [],
     popularBooks: [],
-    categories: [
-      { name: "玄幻", icon: "🐉" },
-      { name: "修真", icon: "⚔️" },
-      { name: "都市", icon: "🌆" },
-      { name: "历史", icon: "📚" },
-      { name: "科幻", icon: "🚀" },
-      { name: "网游", icon: "🎮" },
-    ],
+    categories: [],
+    allCategories: [],
     loading: false,
     error: null,
   }),
 
+  getters: {
+    // 获取热门分类（展示前12个）
+    hotCategories: (state) => {
+      return state.categories.slice(0, 12);
+    },
+  },
+
   actions: {
+    async fetchCategories() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const { sorts } = await bookApi.getBookSorts();
+        this.allCategories = sorts;
+
+        // 转换为带图标的分类数组
+        this.categories = sorts.map((sort) => ({
+          name: sort,
+          icon: SORT_ICONS[sort] || SORT_ICONS.default,
+        }));
+      } catch (error: any) {
+        this.error = error.message;
+        console.error("获取分类失败:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async fetchLatestBooks() {
       this.loading = true;
       this.error = null;

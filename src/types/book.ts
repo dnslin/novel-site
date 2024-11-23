@@ -19,6 +19,7 @@ export interface Book {
   tag?: string;
   hot_value: number;
   created_at: string;
+  downloads: number;
 }
 
 // 书籍详情
@@ -29,4 +30,5 @@ export interface BookDetail extends Book {
   new_file_name: string;
   parts: string;
   file_url: string;
+  downloads: number;
 }

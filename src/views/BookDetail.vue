@@ -204,11 +204,13 @@ const downloadBook = async () => {
 
           <!-- 标签组 - 添加图标和动画 -->
           <div class="flex flex-wrap items-center gap-3 mb-6">
-            <span class="tag-badge">
+            <span
+              class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
               <TagIcon class="w-4 h-4" />
               {{ book.sort }}
             </span>
-            <span class="tag-badge">
+            <span
+              class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
               <DocumentTextIcon class="w-4 h-4" />
               {{ book.tag }}
             </span>
@@ -216,25 +218,30 @@ const downloadBook = async () => {
 
           <!-- 统计数据 - 添加动画和图标 -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div class="stat-item hover:scale-105 transition-transform">
+            <div
+              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
               <FireIcon class="w-5 h-5 text-orange-500 mb-1" />
-              <span class="stat-label">热度</span>
-              <span class="stat-value">{{ book.hot_value }}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">热度</span>
+              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ book.hot_value }}</span>
             </div>
-            <div class="stat-item hover:scale-105 transition-transform">
+            <div
+              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
               <CloudArrowDownIcon class="w-5 h-5 text-blue-500 mb-1" />
-              <span class="stat-label">下载次数</span>
-              <span class="stat-value">{{ book.downloads }}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">下载次数</span>
+              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ book.downloads }}</span>
             </div>
-            <div class="stat-item hover:scale-105 transition-transform">
+            <div
+              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
               <DocumentTextIcon class="w-5 h-5 text-green-500 mb-1" />
-              <span class="stat-label">文件大小</span>
-              <span class="stat-value">{{ formatFileSize(book.file_size) }}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">文件大小</span>
+              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ formatFileSize(book.file_size)
+                }}</span>
             </div>
-            <div class="stat-item hover:scale-105 transition-transform">
+            <div
+              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
               <CalendarIcon class="w-5 h-5 text-purple-500 mb-1" />
-              <span class="stat-label">上传时间</span>
-              <span class="stat-value">{{ formatDate(book.created_at) }}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">上传时间</span>
+              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ formatDate(book.created_at) }}</span>
             </div>
           </div>
 
@@ -250,7 +257,8 @@ const downloadBook = async () => {
 
           <!-- 操作按钮 -->
           <div class="flex flex-wrap gap-4">
-            <button @click="downloadBook" :disabled="downloading" class="btn-primary relative overflow-hidden group">
+            <button @click="downloadBook" :disabled="downloading"
+              class="flex items-center px-6 py-2.5 bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white rounded-lg transition-colors duration-300 shadow-sm hover:shadow-md disabled:opacity-80 disabled:cursor-wait relative overflow-hidden group">
               <div class="flex items-center">
                 <ArrowPathIcon v-if="downloading" class="w-5 h-5 mr-2 animate-spin" />
                 <CloudArrowDownIcon v-else class="w-5 h-5 mr-2 group-hover:-translate-y-1 transition-transform" />
@@ -258,14 +266,15 @@ const downloadBook = async () => {
               </div>
 
               <!-- 进度条 -->
-              <div v-if="downloading" class="absolute bottom-0 left-0 h-1 bg-white/30"
+              <div v-if="downloading"
+                class="absolute bottom-0 left-0 h-1 bg-white/30 transition-all duration-300 ease-out"
                 :style="{ width: `${downloadProgress}%` }">
-                <div class="absolute right-0 top-0 h-full w-2 bg-white/50 
-                          animate-pulse"></div>
+                <div class="absolute right-0 top-0 h-full w-2 bg-white/50 animate-pulse"></div>
               </div>
             </button>
 
-            <button @click="toggleCollect" class="btn-secondary group">
+            <button @click="toggleCollect"
+              class="flex items-center px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300 group">
               <HeartSolidIcon v-if="isCollected" class="w-5 h-5 mr-2 text-red-500 animate-bounce" />
               <HeartIcon v-else class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
               {{ isCollected ? '已收藏' : '收藏' }}
@@ -304,9 +313,10 @@ const downloadBook = async () => {
                  focus:border-transparent" placeholder="写下你的评价..."></textarea>
         <div class="flex flex-wrap gap-2">
           <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRateWithAnimation(type.id)"
-            :disabled="ratingLoading" class="btn-rating" :class="{
-              'opacity-50 cursor-not-allowed': ratingLoading,
-              'rating-success': showRatingSuccess
+            :disabled="ratingLoading"
+            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary dark:hover:bg-primary-light dark:hover:border-primary-light transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="{
+              'animate-[success-pulse_0.5s_ease-in-out]': showRatingSuccess
             }">
             <span class="flex items-center">
               <StarIcon class="w-5 h-5 mr-1" />
@@ -327,46 +337,6 @@ const downloadBook = async () => {
 </template>
 
 <style scoped>
-.stat-item {
-  @apply flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300;
-}
-
-.stat-label {
-  @apply text-sm text-gray-500 dark:text-gray-400;
-}
-
-.stat-value {
-  @apply text-lg font-semibold text-gray-900 dark:text-white;
-}
-
-.btn-primary {
-  @apply flex items-center px-6 py-2.5 bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white rounded-lg transition-colors duration-300 shadow-sm hover:shadow-md;
-}
-
-.btn-secondary {
-  @apply flex items-center px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300;
-}
-
-.btn-rating {
-  @apply px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary dark:hover:bg-primary-light dark:hover:border-primary-light transition-all duration-300;
-}
-
-/* 添加下载按钮的特殊样式 */
-.btn-primary:disabled {
-  @apply opacity-80 cursor-wait;
-}
-
-/* 进度条动画 */
-.btn-primary div {
-  @apply transition-all duration-300 ease-out;
-}
-
-/* 添加新的动画样式 */
-.tag-badge {
-  @apply flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light;
-}
-
-/* 添加评分成功动画 */
 @keyframes success-pulse {
 
   0%,
@@ -379,19 +349,5 @@ const downloadBook = async () => {
     transform: scale(1.1);
     opacity: 0.8;
   }
-}
-
-.rating-success {
-  animation: success-pulse 0.5s ease-in-out;
-}
-
-/* 添加悬停动画 */
-.hover-lift {
-  @apply transition-transform duration-300 hover:-translate-y-1;
-}
-
-/* 添加脉冲动画 */
-.pulse {
-  @apply animate-pulse;
 }
 </style>

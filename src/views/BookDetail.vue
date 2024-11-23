@@ -5,6 +5,20 @@ import { useBookStore } from '@/stores/books'
 import { useRatingStore } from '@/stores/ratings'
 import { storeToRefs } from 'pinia'
 import type { BookDetail } from '@/types'
+import {
+  BookOpenIcon,
+  CalendarIcon,
+  CloudArrowDownIcon,
+  HeartIcon,
+  UserIcon,
+  TagIcon,
+  DocumentTextIcon,
+  ArrowPathIcon,
+  StarIcon,
+  FireIcon,
+  CheckCircleIcon
+} from '@heroicons/vue/24/outline'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 
 const route = useRoute()
 const bookStore = useBookStore()
@@ -18,6 +32,27 @@ const commentText = ref('')
 // 添加下载相关的状态
 const downloading = ref(false)
 const downloadProgress = ref(0)
+
+// 添加收藏状态
+const isCollected = ref(false)
+const toggleCollect = () => {
+  isCollected.value = !isCollected.value
+  // TODO: 调用收藏 API
+}
+
+// 添加评分动画状态
+const showRatingSuccess = ref(false)
+const handleRateWithAnimation = async (ratingTypeId: number) => {
+  try {
+    await handleRate(ratingTypeId)
+    showRatingSuccess.value = true
+    setTimeout(() => {
+      showRatingSuccess.value = false
+    }, 2000)
+  } catch (error) {
+    console.error('评分失败:', error)
+  }
+}
 
 // 获取数据
 onMounted(async () => {
@@ -126,8 +161,8 @@ const downloadBook = async () => {
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- 书籍详情卡片 -->
-    <div v-if="book"
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors duration-300">
+    <div v-if="book" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300
+                hover:shadow-xl transform hover:-translate-y-1">
       <!-- 移动端封面和标题 -->
       <div class="md:hidden">
         <div class="relative w-full pb-[56.25%]">
@@ -142,80 +177,98 @@ const downloadBook = async () => {
 
       <!-- 桌面端布局 -->
       <div class="hidden md:flex gap-8 p-6">
-        <!-- 封面 -->
-        <div class="w-64 flex-shrink-0">
-          <img :src="book.cover || '/placeholder.jpg'" :alt="book.title"
-            class="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300" />
+        <!-- 封面 - 添加悬停效果 -->
+        <div class="w-64 flex-shrink-0 group">
+          <div class="relative overflow-hidden rounded-lg">
+            <img :src="book.cover || '/placeholder.jpg'" :alt="book.title"
+              class="w-full transition-transform duration-500 group-hover:scale-110" />
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
+                      transition-opacity duration-300 flex items-center justify-center">
+              <BookOpenIcon class="w-12 h-12 text-white transform -translate-y-4 
+                                 group-hover:translate-y-0 transition-all duration-300" />
+            </div>
+          </div>
         </div>
 
         <!-- 主要信息 -->
         <div class="flex-grow">
-          <h1 class="text-3xl font-bold mb-3 text-gray-900 dark:text-white">{{ book.title }}</h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">作者：{{ book.author }}</p>
+          <div class="flex items-center gap-4 mb-3">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ book.title }}</h1>
+            <StarIcon class="w-6 h-6 text-yellow-400 animate-pulse" v-if="book.hot_value > 1000" />
+          </div>
 
-          <!-- 标签组 -->
+          <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
+            <UserIcon class="w-5 h-5" />
+            <span>{{ book.author }}</span>
+          </div>
+
+          <!-- 标签组 - 添加图标和动画 -->
           <div class="flex flex-wrap items-center gap-3 mb-6">
-            <span
-              class="px-3 py-1 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-full text-sm">
+            <span class="tag-badge">
+              <TagIcon class="w-4 h-4" />
               {{ book.sort }}
             </span>
-            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm">
+            <span class="tag-badge">
+              <DocumentTextIcon class="w-4 h-4" />
               {{ book.tag }}
             </span>
           </div>
 
-          <!-- 统计数据 -->
+          <!-- 统计数据 - 添加动画和图标 -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div class="stat-item">
+            <div class="stat-item hover:scale-105 transition-transform">
+              <FireIcon class="w-5 h-5 text-orange-500 mb-1" />
               <span class="stat-label">热度</span>
               <span class="stat-value">{{ book.hot_value }}</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item hover:scale-105 transition-transform">
+              <CloudArrowDownIcon class="w-5 h-5 text-blue-500 mb-1" />
               <span class="stat-label">下载次数</span>
               <span class="stat-value">{{ book.downloads }}</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item hover:scale-105 transition-transform">
+              <DocumentTextIcon class="w-5 h-5 text-green-500 mb-1" />
               <span class="stat-label">文件大小</span>
               <span class="stat-value">{{ formatFileSize(book.file_size) }}</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item hover:scale-105 transition-transform">
+              <CalendarIcon class="w-5 h-5 text-purple-500 mb-1" />
               <span class="stat-label">上传时间</span>
               <span class="stat-value">{{ formatDate(book.created_at) }}</span>
             </div>
           </div>
 
-          <!-- 简介 -->
-          <p
-            class="text-gray-700 dark:text-gray-300 mb-6 line-clamp-3 hover:line-clamp-none transition-all duration-300">
-            {{ book.intro }}
+          <!-- 简介 - 添加渐变遮罩 -->
+          <p class="text-gray-700 dark:text-gray-300 mb-6 relative">
+            <span class="line-clamp-3 hover:line-clamp-none transition-all duration-500">
+              {{ book.intro }}
+            </span>
+          <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t 
+                      from-white dark:from-gray-800 to-transparent 
+                      pointer-events-none"></div>
           </p>
 
           <!-- 操作按钮 -->
           <div class="flex flex-wrap gap-4">
-            <button @click="downloadBook" :disabled="downloading" class="btn-primary relative overflow-hidden">
-              <!-- 下载图标 -->
-              <svg class="w-5 h-5 mr-2" :class="{ 'animate-spin': downloading }" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path v-if="!downloading" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-
-              <!-- 按钮文字 -->
-              <span>{{ downloading ? `下载中 ${downloadProgress}%` : '下载' }}</span>
+            <button @click="downloadBook" :disabled="downloading" class="btn-primary relative overflow-hidden group">
+              <div class="flex items-center">
+                <ArrowPathIcon v-if="downloading" class="w-5 h-5 mr-2 animate-spin" />
+                <CloudArrowDownIcon v-else class="w-5 h-5 mr-2 group-hover:-translate-y-1 transition-transform" />
+                <span>{{ downloading ? `下载中 ${downloadProgress}%` : '下载' }}</span>
+              </div>
 
               <!-- 进度条 -->
               <div v-if="downloading" class="absolute bottom-0 left-0 h-1 bg-white/30"
-                :style="{ width: `${downloadProgress}%` }"></div>
+                :style="{ width: `${downloadProgress}%` }">
+                <div class="absolute right-0 top-0 h-full w-2 bg-white/50 
+                          animate-pulse"></div>
+              </div>
             </button>
 
-            <button class="btn-secondary">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-              收藏
+            <button @click="toggleCollect" class="btn-secondary group">
+              <HeartSolidIcon v-if="isCollected" class="w-5 h-5 mr-2 text-red-500 animate-bounce" />
+              <HeartIcon v-else class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+              {{ isCollected ? '已收藏' : '收藏' }}
             </button>
           </div>
         </div>
@@ -250,19 +303,32 @@ const downloadBook = async () => {
                  focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary-light/50
                  focus:border-transparent" placeholder="写下你的评价..."></textarea>
         <div class="flex flex-wrap gap-2">
-          <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRate(type.id)"
-            :disabled="ratingLoading" class="btn-rating" :class="{ 'opacity-50 cursor-not-allowed': ratingLoading }">
-            {{ type.name }}
+          <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRateWithAnimation(type.id)"
+            :disabled="ratingLoading" class="btn-rating" :class="{
+              'opacity-50 cursor-not-allowed': ratingLoading,
+              'rating-success': showRatingSuccess
+            }">
+            <span class="flex items-center">
+              <StarIcon class="w-5 h-5 mr-1" />
+              {{ type.name }}
+            </span>
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- 添加评分成功提示 -->
+    <div v-if="showRatingSuccess" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg
+                flex items-center gap-2 animate-fade-in-up">
+      <CheckCircleIcon class="w-5 h-5" />
+      <span>评分成功！</span>
     </div>
   </div>
 </template>
 
 <style scoped>
 .stat-item {
-  @apply flex flex-col p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50;
+  @apply flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300;
 }
 
 .stat-label {
@@ -293,5 +359,39 @@ const downloadBook = async () => {
 /* 进度条动画 */
 .btn-primary div {
   @apply transition-all duration-300 ease-out;
+}
+
+/* 添加新的动画样式 */
+.tag-badge {
+  @apply flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light;
+}
+
+/* 添加评分成功动画 */
+@keyframes success-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.rating-success {
+  animation: success-pulse 0.5s ease-in-out;
+}
+
+/* 添加悬停动画 */
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-1;
+}
+
+/* 添加脉冲动画 */
+.pulse {
+  @apply animate-pulse;
 }
 </style>

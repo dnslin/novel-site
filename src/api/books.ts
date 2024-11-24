@@ -25,4 +25,11 @@ export const bookApi = {
   getBookSorts() {
     return instance.get<never, { sorts: string[] }>("/books/sorts");
   },
+
+  // 添加搜索建议接口
+  searchSuggestions(keyword: string) {
+    return instance.post<never, PaginatedResponse<Book>>("/books/search", {
+      keyword,
+    });
+  },
 };

@@ -36,6 +36,7 @@ interface BookState {
   allCategories: string[];
   loading: boolean;
   error: string | null;
+  searchSuggestions: Book[];
 }
 
 export const useBookStore = defineStore("books", {
@@ -46,6 +47,7 @@ export const useBookStore = defineStore("books", {
     allCategories: [],
     loading: false,
     error: null,
+    searchSuggestions: [],
   }),
 
   getters: {
@@ -137,6 +139,21 @@ export const useBookStore = defineStore("books", {
         throw error;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async fetchSearchSuggestions(keyword: string) {
+      if (!keyword.trim()) {
+        this.searchSuggestions = [];
+        return;
+      }
+
+      try {
+        const data = await bookApi.searchSuggestions(keyword);
+        this.searchSuggestions = data.items;
+      } catch (error: any) {
+        console.error("获取搜索建议失败:", error);
+        this.searchSuggestions = [];
       }
     },
   },

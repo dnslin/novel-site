@@ -6,7 +6,7 @@
                 <!-- 网站信息 - 始终占满宽度 -->
                 <div class="col-span-full md:col-span-1 space-y-4 group">
                     <div class="flex items-center justify-center sm:justify-start space-x-2">
-                        <img src="@/assets/logo.svg" alt="Logo"
+                        <img src="@/assets/logo.png" alt="Logo"
                             class="w-8 h-8 transform transition-transform duration-300 group-hover:rotate-12" />
                         <span class="text-xl font-bold text-gray-900 dark:text-white 
                                    hover:text-primary dark:hover:text-primary-light 

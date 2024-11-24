@@ -155,14 +155,15 @@ onMounted(async () => {
                                    focus:ring-primary/50 dark:focus:ring-primary-light/50"
                             placeholder="搜索你感兴趣的书籍、作者..." />
 
-                        <!-- 搜索建议下拉框 -->
-                        <div v-if="showSuggestions && searchSuggestions.length > 0" class="absolute w-full mt-2 py-2 bg-white dark:bg-gray-800 
+                        <!-- 搜索建议下拉框 - 使用绝对定位 -->
+                        <div v-if="showSuggestions && searchSuggestions.length > 0" class="absolute left-0 right-0 mt-2 py-2 
+                                    bg-white dark:bg-gray-800 
                                     rounded-lg shadow-lg border border-gray-200 
-                                    dark:border-gray-700 z-50">
+                                    dark:border-gray-700 z-50 min-w-full">
                             <div v-for="book in searchSuggestions" :key="book.id"
                                 @mousedown="handleSuggestionClick(book)" class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
                                         cursor-pointer flex items-center space-x-3
-                                        transition-colors duration-200">
+                                        transition-colors duration-200 z-50">
                                 <img v-if="book.cover" :src="book.cover" :alt="book.title"
                                     class="w-10 h-14 object-cover rounded" />
                                 <div class="flex-1">
@@ -177,11 +178,9 @@ onMounted(async () => {
                         </div>
 
                         <button @click="handleSearchBlur" class="absolute right-4 top-1/2 -translate-y-1/2 
-                                       transition-colors duration-300
-                                       text-gray-600 dark:text-gray-400 
-                                       hover:text-primary dark:hover:text-primary-light">
-                            <svg class="w-6 h-6 transition-transform duration-300 hover:scale-110" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                                       text-white/60 hover:text-white 
+                                       transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -192,7 +191,7 @@ onMounted(async () => {
         </header>
 
         <!-- 主要内容区 -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative">
             <!-- 分类导航 -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12 px-2">
                 <router-link v-for="category in bookStore.hotCategories" :key="category.name"

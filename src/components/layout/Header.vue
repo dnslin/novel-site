@@ -13,7 +13,7 @@ const isDark = computed(() => theme.value === 'dark')
             <div class="flex items-center justify-between h-16">
                 <!-- Logo - 添加动画效果 -->
                 <router-link to="/" class="flex items-center space-x-2 group">
-                    <img src="@/assets/logo.svg" alt="Logo"
+                    <img src="@/assets/logo.png" alt="Logo"
                         class="w-8 h-8 transition-transform duration-300 group-hover:rotate-12" />
                     <span class="text-xl font-bold text-gray-900 dark:text-white 
                                group-hover:text-primary dark:group-hover:text-primary-light

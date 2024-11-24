@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, type Ref } from 'vue'
+import { ref, onMounted, computed, type Ref, watch } from 'vue'
 import { useTheme } from '@/composables/useTheme'
-import { ChevronRightIcon, BookOpenIcon, FireIcon, MoonIcon, SunIcon } from '@heroicons/vue/24/outline'
+import { ChevronRightIcon, BookOpenIcon, FireIcon } from '@heroicons/vue/24/outline'
 import { useBookStore } from '@/stores/books'
 import { storeToRefs } from 'pinia'
 import type { Book } from '@/types'
-const { theme, toggleTheme } = useTheme()
+const { theme } = useTheme()
 const bookStore = useBookStore()
-const { latestBooks, popularBooks, categories, loading } = storeToRefs(bookStore)
+const { latestBooks, loading } = storeToRefs(bookStore)
 
 
 // 搜索相关
@@ -16,6 +16,18 @@ const searchResults = ref<Book[]>([])
 const isSearching = ref(false)
 
 const isDark = computed(() => theme.value === 'dark')
+
+// 添加背景图切换动画状态
+const bgTransitioning = ref(false)
+
+// 监听主题变化
+watch(isDark, (newValue) => {
+    console.log('theme changed', newValue ? 'dark' : 'light')
+    bgTransitioning.value = true
+    setTimeout(() => {
+        bgTransitioning.value = false
+    }, 500)
+}, { immediate: true })
 
 // 处理搜索
 const handleSearch = async () => {
@@ -68,28 +80,28 @@ onMounted(async () => {
 <template>
     <div
         class="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-        <!-- 主题切换按钮 -->
-        <button @click="toggleTheme"
-            class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
-            <MoonIcon v-if="!isDark" class="w-6 h-6 text-gray-800" />
-            <SunIcon v-else class="w-6 h-6 text-yellow-400" />
-        </button>
-
-
         <!-- 顶部横幅区域 -->
         <header class="relative">
             <div class="hero-section py-24">
-                <!-- 背景图层 - 使用计算属性动态切换背景图 -->
-                <div class="absolute inset-0 w-full h-full transition-opacity duration-500">
+                <!-- 背景图层 -->
+                <div class="absolute inset-0 w-full h-full">
                     <!-- 白天模式背景图 -->
                     <img src="@/assets/blob-scene-light.svg" alt="background"
-                        class="w-full h-full object-cover transition-opacity duration-500"
-                        :class="{ 'opacity-0': isDark, 'opacity-100': !isDark }" />
+                        class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
+                            { 'opacity-0': isDark, 'opacity-100': !isDark },
+                            { 'scale-105': bgTransitioning }
+                        ]" />
                     <!-- 黑夜模式背景图 -->
                     <img src="@/assets/blob-scene-black.svg" alt="background"
-                        class="w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-500"
-                        :class="{ 'opacity-100': isDark, 'opacity-0': !isDark }" />
+                        class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
+                            { 'opacity-100': isDark, 'opacity-0': !isDark },
+                            { 'scale-105': bgTransitioning }
+                        ]" />
                 </div>
+
+                <!-- 添加渐变遮罩 -->
+                <div class="absolute inset-0 bg-gradient-to-b transition-all duration-500"
+                    :class="isDark ? 'from-gray-900/5 to-gray-900/5' : 'from-gray-900/5 to-gray-900/5'"></div>
 
                 <!-- 内容区域 -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -238,25 +250,43 @@ onMounted(async () => {
 
                     <div class="space-y-4">
                         <template v-if="!loading && latestBooks.length">
-                            <router-link v-for="book in latestBooks" :key="book.id" :to="`/books/${book.id}`"
-                                class="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                                <div class="w-24 h-32 flex-shrink-0 overflow-hidden">
-                                    <img :src="book.cover || '/placeholder.jpg'" :alt="book.title"
-                                        class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" />
+                            <router-link v-for="book in latestBooks" :key="book.id" :to="`/books/${book.id}`" class="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg 
+                                       transition-all duration-300 group">
+                                <!-- 封面图片容器 -->
+                                <div
+                                    class="relative w-24 h-32 flex-shrink-0 overflow-hidden bg-gray-200 dark:bg-gray-600">
+                                    <!-- 骨架屏 -->
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
+                                               animate-shimmer" style="background-size: 200% 100%;"></div>
+
+                                    <!-- 默认占位图标 -->
+                                    <div v-if="!book.cover"
+                                        class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                                        <BookOpenIcon class="w-12 h-12" />
+                                    </div>
+
+                                    <!-- 图片 -->
+                                    <img v-if="book.cover" :src="book.cover" :alt="book.title" class="w-full h-full object-cover transform group-hover:scale-105 
+                                                transition-all duration-300 opacity-0 animate-fade-in" @load="(e) => {
+                                                    const img = e.target as HTMLImageElement;
+                                                    img.classList.remove('opacity-0');
+                                                }" />
                                 </div>
+
+                                <!-- 其他内容保持不变 -->
                                 <div class="flex-1 p-4">
-                                    <h3
-                                        class="font-medium mb-2 group-hover:text-primary dark:text-white transition-colors line-clamp-1">
+                                    <h3 class="font-medium mb-2 group-hover:text-primary dark:text-white 
+                                              transition-colors line-clamp-1">
                                         {{ book.title }}
                                     </h3>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ book.author }}</p>
                                     <div class="mt-2 flex items-center gap-2 text-xs">
-                                        <span
-                                            class="px-2 py-1 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light">
+                                        <span class="px-2 py-1 rounded-full bg-primary/10 text-primary 
+                                                   dark:bg-primary/20 dark:text-primary-light">
                                             {{ book.sort }}
                                         </span>
-                                        <span
-                                            class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                                        <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 
+                                                   dark:bg-gray-600 dark:text-gray-300">
                                             {{ book.tag }}
                                         </span>
                                     </div>
@@ -294,11 +324,16 @@ onMounted(async () => {
 .hero-section {
     position: relative;
     overflow: hidden;
-    /* 移除原来的渐变背景 */
 }
 
+/* 移除之前的背景相关样式 */
 .hero-section::before {
     content: none;
+}
+
+/* 确保图片过渡效果平滑 */
+.hero-section img {
+    transition: opacity 0.5s ease;
 }
 
 /* 修改打字机容器样式 */
@@ -367,5 +402,37 @@ p.typewriter-container {
 /* 确保文字在深色背景上清晰可见 */
 .typewriter-container {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 修改背景图动画 */
+.hero-section img {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+@keyframes subtle-move {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+
+    50% {
+        transform: scale(1.05) translate(-1%, -1%);
+    }
+
+    100% {
+        transform: scale(1) translate(0, 0);
+    }
+}
+
+.hero-section img {
+    animation: subtle-move 20s ease-in-out infinite;
+}
+
+/* 确保动画性能 */
+.hero-section {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 </style>

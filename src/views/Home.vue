@@ -99,9 +99,6 @@ onMounted(async () => {
                         ]" />
                 </div>
 
-                <!-- 添加渐变遮罩 -->
-                <div class="absolute inset-0 bg-gradient-to-b transition-all duration-500"
-                    :class="isDark ? 'from-gray-900/5 to-gray-900/5' : 'from-gray-900/5 to-gray-900/5'"></div>
 
                 <!-- 内容区域 -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

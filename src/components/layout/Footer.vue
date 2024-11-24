@@ -97,9 +97,14 @@
                         </h3>
                         <div class="flex justify-center sm:justify-start space-x-4">
                             <a href="#" class="group p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 
-                                      transition-all duration-300">
-                                <span class="sr-only">GitHub</span>
-                                <svg class="w-6 h-6 text-gray-600 dark:text-gray-400 
+                                      transition-all duration-300 relative">
+                                <!-- 添加悬停时的光晕效果 -->
+                                <div class="absolute inset-0 bg-primary/20 dark:bg-primary-light/20 
+                                            rounded-full blur opacity-0 group-hover:opacity-100 
+                                            transition-opacity duration-300">
+                                </div>
+                                <!-- GitHub 图标 -->
+                                <svg class="w-6 h-6 relative z-10 text-gray-600 dark:text-gray-400 
                                          group-hover:text-primary dark:group-hover:text-primary-light
                                          transform transition-all duration-300 group-hover:scale-110"
                                     fill="currentColor" viewBox="0 0 24 24">
@@ -150,6 +155,41 @@ import {
 
     h3:hover::after {
         width: 64px;
+    }
+}
+
+.link-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.link-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(var(--primary-rgb), 0.3);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.link-ripple:hover::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
     }
 }
 </style>

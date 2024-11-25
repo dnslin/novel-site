@@ -27,7 +27,7 @@ defineProps<{
 <template>
     <div class="hero-section py-24 relative overflow-visible">
         <!-- 背景图层 -->
-        <div class="absolute inset-0 w-full h-full overflow-hidden">
+        <div class="absolute inset-0 w-full h-full overflow-hidden rounded-xl">
             <img src="@/assets/blob-scene-light.svg" alt="background"
                 class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
                     { 'opacity-0': isDark, 'opacity-100': !isDark },

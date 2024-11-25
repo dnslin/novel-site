@@ -39,6 +39,11 @@ interface BookState {
   searchSuggestions: Book[];
 }
 
+interface Category {
+  name: string;
+  bookCount?: number;
+}
+
 export const useBookStore = defineStore("books", {
   state: (): BookState => ({
     latestBooks: [],

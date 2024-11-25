@@ -25,9 +25,9 @@ defineProps<{
 </script>
 
 <template>
-    <div class="hero-section py-24">
+    <div class="hero-section py-24 relative overflow-visible">
         <!-- 背景图层 -->
-        <div class="absolute inset-0 w-full h-full">
+        <div class="absolute inset-0 w-full h-full overflow-hidden">
             <img src="@/assets/blob-scene-light.svg" alt="background"
                 class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
                     { 'opacity-0': isDark, 'opacity-100': !isDark },
@@ -43,17 +43,20 @@ defineProps<{
         <!-- 内容区域 -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- 主标题 -->
-            <h1 class="text-5xl font-bold mb-6 text-white dark:text-white typewriter-container">
-                {{ displayedMainTitle }}
+            <h1 class="text-5xl font-bold mb-6 text-white dark:text-white">
+                <span class="block typewriter-container">{{ displayedMainTitle }}</span>
             </h1>
 
             <!-- 副标题 -->
-            <p v-show="showSubTitle" class="text-xl mb-8 text-white/90 dark:text-gray-200 typewriter-container"
-                :class="{ 'fade-in': showSubTitle }">
-                {{ displayedSubTitle }}
+            <p v-show="showSubTitle" class="text-xl mb-24 text-white/90 dark:text-gray-200">
+                <span class="block typewriter-container" :class="{ 'fade-in': showSubTitle }">
+                    {{ displayedSubTitle }}
+                </span>
             </p>
+        </div>
 
-            <!-- 插槽用于搜索框 -->
+        <!-- 搜索框插槽 -->
+        <div class="absolute left-0 right-0 bottom-20 z-20">
             <slot name="search"></slot>
         </div>
     </div>
@@ -62,7 +65,7 @@ defineProps<{
 <style scoped>
 .hero-section {
     position: relative;
-    overflow: hidden;
+    min-height: 400px;
 }
 
 /* 确保图片过渡效果平滑 */
@@ -76,25 +79,10 @@ defineProps<{
 
 /* 打字机容器样式 */
 .typewriter-container {
-    display: block;
-    position: relative;
+    display: inline-block;
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* 为主标题设置样式 */
-h1.typewriter-container {
-    min-height: 4rem;
-    white-space: pre-line;
-    line-height: 1.2;
-}
-
-/* 为副标题设置样式 */
-p.typewriter-container {
-    min-height: 2rem;
-    white-space: pre-line;
-    line-height: 1.5;
 }
 
 /* 为副标题添加淡入效果 */
@@ -146,14 +134,16 @@ p.typewriter-container {
 
 /* 响应式调整 */
 @media (max-width: 640px) {
-    h1.typewriter-container {
-        font-size: 2.5rem;
-        min-height: 3rem;
+    .hero-section {
+        min-height: 300px;
     }
 
-    p.typewriter-container {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    p {
         font-size: 1.125rem;
-        min-height: 1.5rem;
     }
 }
 </style>

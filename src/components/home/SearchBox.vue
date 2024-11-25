@@ -61,7 +61,7 @@ watch(searchKeyword, (newValue) => {
         <div v-if="showSuggestions && searchSuggestions.length > 0" class="absolute left-0 right-0 mt-2 py-2 
                 bg-white dark:bg-gray-800 
                 rounded-lg shadow-lg border border-gray-200 
-                dark:border-gray-700 z-50 min-w-full">
+                dark:border-gray-700 z-[999] min-w-full">
             <!-- 搜索建议列表 -->
             <div v-for="book in searchSuggestions" :key="book.id" @mousedown="handleSuggestionClick(book)" class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
                   cursor-pointer flex items-center space-x-3

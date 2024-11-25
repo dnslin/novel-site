@@ -246,14 +246,14 @@ const downloadBook = async () => {
           </div>
 
           <!-- 简介 - 添加渐变遮罩 -->
-          <p class="text-gray-700 dark:text-gray-300 mb-6 relative">
+          <div class="text-gray-700 dark:text-gray-300 mb-6 relative">
             <span class="line-clamp-3 hover:line-clamp-none transition-all duration-500">
               {{ book.intro }}
             </span>
-          <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t 
-                      from-white dark:from-gray-800 to-transparent 
-                      pointer-events-none"></div>
-          </p>
+            <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t 
+                        from-white dark:from-gray-800 to-transparent 
+                        pointer-events-none"></div>
+          </div>
 
           <!-- 操作按钮 -->
           <div class="flex flex-wrap gap-4">

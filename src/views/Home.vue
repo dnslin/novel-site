@@ -32,8 +32,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div
-        class="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div class="min-h-screen">
         <!-- Banner区域 -->
         <div class="relative z-50">
             <HeroBanner :main-title="mainTitle" :sub-title="subTitle" :displayed-main-title="displayedMainTitle"

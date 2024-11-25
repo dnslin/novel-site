@@ -43,12 +43,12 @@ defineProps<{
         <!-- 内容区域 -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- 主标题 -->
-            <h1 class="text-5xl font-bold mb-6 text-white dark:text-white">
+            <h1 class="text-5xl font-bold mb-6 text-gray-800 dark:text-white">
                 <span class="block typewriter-container">{{ displayedMainTitle }}</span>
             </h1>
 
             <!-- 副标题 -->
-            <p v-show="showSubTitle" class="text-xl mb-24 text-white/90 dark:text-gray-200">
+            <p v-show="showSubTitle" class="text-xl mb-24 text-gray-600 dark:text-gray-200">
                 <span class="block typewriter-container" :class="{ 'fade-in': showSubTitle }">
                     {{ displayedSubTitle }}
                 </span>

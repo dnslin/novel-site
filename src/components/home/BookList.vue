@@ -105,11 +105,11 @@ defineProps<{
 }
 
 .animate-shimmer {
-    animation: shimmer 2s infinite linear;
+    animation: shimmer 1s infinite linear;
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.3s ease-in-out forwards;
+    animation: fadeIn 0.2s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
@@ -118,7 +118,7 @@ defineProps<{
     }
 
     to {
-        opacity: 1;
+        opacity: 2;
     }
 }
 

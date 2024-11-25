@@ -22,7 +22,7 @@ const debouncedSearch = useDebounceFn(async (keyword: string) => {
 
 // 处理建议项点击
 const handleSuggestionClick = (book: Book) => {
-    router.push(`/book/${book.id}`)
+    router.push(`/books/${book.id}`)
     showSuggestions.value = false
     searchKeyword.value = ''
 }
@@ -44,7 +44,6 @@ watch(searchKeyword, (newValue) => {
     }
 })
 </script>
-
 <template>
     <div class="max-w-2xl mx-auto relative animate-search">
         <input type="text" v-model="searchKeyword" @focus="showSuggestions = true" @blur="handleSearchBlur" class="w-full pl-6 pr-12 py-4 rounded-full 
@@ -54,7 +53,7 @@ watch(searchKeyword, (newValue) => {
              dark:text-white text-gray-700
              bg-white/20 dark:bg-gray-900/20
              backdrop-blur-sm
-             border-white/30 dark:border-gray-600/30
+             border-gray-300 dark:border-gray-600/30
              focus:ring-primary/50 dark:focus:ring-primary-light/50" placeholder="搜索你感兴趣的书籍、作者..." />
 
         <!-- 搜索建议下拉框 -->

@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useBookStore } from '@/stores/books'
 import BookList from '@/components/home/BookList.vue'
 import type { Book } from '@/types'
+import { useToast } from 'vue-toastification'
 
 interface Props {
     title: string
@@ -10,6 +11,7 @@ interface Props {
     type: 'latest' | 'hotest'
 }
 
+const toast = useToast()
 const props = defineProps<Props>()
 const bookStore = useBookStore()
 const books = ref<Book[]>([])
@@ -68,18 +70,31 @@ const loadBooks = async (page: number) => {
         books.value = data.items
         totalPages.value = Math.ceil(data.total / pageSize)
     } catch (error) {
-        console.error(`获取${props.title}书籍失败:`, error)
+        toast.error(`获取${props.title}书籍失败，请稍后重试`)
     } finally {
         loading.value = false
     }
 }
 
 // 切换页面
-const handlePageChange = (page: number) => {
-    currentPage.value = page
-    loadBooks(page)
-    // 滚动到顶部
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+const handlePageChange = async (page: number) => {
+    try {
+        loading.value = true
+        const data = await (props.type === 'latest'
+            ? bookStore.getLatestBooks(page, pageSize)
+            : bookStore.getPopularBooks(page, pageSize))
+
+        books.value = data.items
+        totalPages.value = Math.ceil(data.total / pageSize)
+        currentPage.value = page
+
+        // 滚动到顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (error) {
+        toast.error(`加载${props.title}书籍失败，请稍后重试`)
+    } finally {
+        loading.value = false
+    }
 }
 
 onMounted(() => {

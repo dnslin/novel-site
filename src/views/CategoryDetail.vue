@@ -4,12 +4,14 @@ import { useRoute } from 'vue-router'
 import { useBookStore } from '@/stores/books'
 import BookList from '@/components/home/BookList.vue'
 import type { Book } from '@/types'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 const bookStore = useBookStore()
 const categoryName = route.params.name as string
 const books = ref<Book[]>([])
 const loading = ref(true)
+const toast = useToast()
 
 onMounted(async () => {
     loading.value = true
@@ -18,7 +20,7 @@ onMounted(async () => {
         const data = await bookStore.getBooksByCategory(categoryName)
         books.value = data.items
     } catch (error) {
-        console.error('获取分类书籍失败:', error)
+        toast.error('获取分类书籍失败，请稍后重试')
     } finally {
         loading.value = false
     }

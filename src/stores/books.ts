@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { bookApi } from "@/api";
 import type { Book } from "@/types";
+import { useToast } from "vue-toastification";
 
 // 定义分类图标映射
 const SORT_ICONS: Record<string, string> = {
@@ -84,6 +85,7 @@ export const useBookStore = defineStore("books", {
     },
 
     async fetchLatestBooks() {
+      const toast = useToast();
       this.loading = true;
       this.error = null;
       try {
@@ -93,9 +95,11 @@ export const useBookStore = defineStore("books", {
           type: "latest",
         });
         this.latestBooks = data.items;
+        return data;
       } catch (error: any) {
         this.error = error.message;
-        console.error("获取最新书籍失败:", error);
+        toast.error("获取最新书籍失败");
+        throw error;
       } finally {
         this.loading = false;
       }

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useBookStore } from '@/stores/books'
 import { storeToRefs } from 'pinia'
 import { useTypeWriter } from '@/utils/typeWriter'
+import { useToast } from 'vue-toastification'
 import HeroBanner from '@/components/home/HeroBanner.vue'
 import SearchBox from '@/components/home/SearchBox.vue'
 import CategoryNav from '@/components/home/CategoryNav.vue'
@@ -10,6 +11,8 @@ import BookList from '@/components/home/BookList.vue'
 
 const bookStore = useBookStore()
 const { latestBooks, popularBooks, loading } = storeToRefs(bookStore)
+
+const toast = useToast()
 
 // 打字机效果相关
 const mainTitle = "探索无尽的阅读世界"
@@ -19,11 +22,15 @@ const displayedSubTitle = ref('')
 const showSubTitle = ref(false)
 
 onMounted(async () => {
-    await Promise.all([
-        bookStore.fetchLatestBooks(),
-        bookStore.fetchPopularBooks(),
-        bookStore.fetchCategories(),
-    ])
+    try {
+        await Promise.all([
+            bookStore.fetchLatestBooks(),
+            bookStore.fetchPopularBooks(),
+            bookStore.fetchCategories(),
+        ])
+    } catch (error) {
+        toast.error('加载数据失败，请刷新页面重试')
+    }
 
     await useTypeWriter(mainTitle, displayedMainTitle, 150)
     showSubTitle.value = true

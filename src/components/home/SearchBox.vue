@@ -5,7 +5,9 @@ import { useBookStore } from '@/stores/books'
 import { storeToRefs } from 'pinia'
 import type { Book } from '@/types'
 import { useDebounceFn } from '@vueuse/core'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const router = useRouter()
 const bookStore = useBookStore()
 const { searchSuggestions } = storeToRefs(bookStore)
@@ -16,7 +18,11 @@ const showSuggestions = ref(false)
 // 使用防抖函数
 const debouncedSearch = useDebounceFn(async (keyword: string) => {
     if (keyword.trim()) {
-        await bookStore.fetchSearchSuggestions(keyword)
+        try {
+            await bookStore.fetchSearchSuggestions(keyword)
+        } catch (error) {
+            toast.error('搜索失败，请稍后重试')
+        }
     }
 }, 300)
 

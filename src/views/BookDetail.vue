@@ -19,10 +19,12 @@ import {
   CheckCircleIcon
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 const bookStore = useBookStore()
 const ratingStore = useRatingStore()
+const toast = useToast()
 
 const bookId = Number(route.params.id)
 const book = ref<BookDetail | null>(null)
@@ -79,8 +81,9 @@ const handleRate = async (ratingTypeId: number) => {
   try {
     await ratingStore.createRating(bookId, ratingTypeId, commentText.value)
     commentText.value = '' // 清空评论
+    toast.success("评分成功！")
   } catch (error) {
-    console.error('评分失败:', error)
+    toast.error("评分失败，请稍后重试")
   }
 }
 
@@ -152,7 +155,7 @@ const downloadBook = async () => {
 
   } catch (error) {
     console.error('下载失败:', error)
-    // 这里可以添加错误提示
+    toast.error("下载失败，请稍后重试")
   } finally {
     downloading.value = false
     downloadProgress.value = 0
@@ -327,13 +330,6 @@ const downloadBook = async () => {
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- 添加评分成功提示 -->
-    <div v-if="showRatingSuccess" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg
-                flex items-center gap-2 animate-fade-in-up">
-      <CheckCircleIcon class="w-5 h-5" />
-      <span>评分成功！</span>
     </div>
   </div>
 </template>

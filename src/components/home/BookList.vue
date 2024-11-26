@@ -44,7 +44,7 @@ defineProps<{
                         </div>
 
                         <!-- 图片 -->
-                        <img v-if="book.cover" :src="book.cover" :alt="book.title" class="w-full h-full object-cover transform group-hover:scale-105 
+                        <img v-if="book.cover" :src="book.cover" :alt="book.title" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-105 
                                     transition-all duration-300 opacity-0 animate-fade-in" @load="(e) => {
                                         const img = e.target as HTMLImageElement;
                                         img.classList.remove('opacity-0');

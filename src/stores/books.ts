@@ -9,7 +9,7 @@ const SORT_ICONS: Record<string, string> = {
   历史: new URL("@/assets/svg/历史.svg", import.meta.url).href,
   文学: new URL("@/assets/svg/文学.svg", import.meta.url).href,
   玄幻: new URL("@/assets/svg/玄幻.svg", import.meta.url).href,
-  都市: new URL("@/assets/svg/现代都市.svg", import.meta.url).href,
+  都市: new URL("@/assets/svg/都市.svg", import.meta.url).href,
   体育: new URL("@/assets/svg/体育.svg", import.meta.url).href,
   游戏: new URL("@/assets/svg/游戏.svg", import.meta.url).href,
   武侠: new URL("@/assets/svg/武侠.svg", import.meta.url).href,
@@ -24,6 +24,11 @@ const SORT_ICONS: Record<string, string> = {
   修真玄幻: new URL("@/assets/svg/修真玄幻.svg", import.meta.url).href,
   玄幻言情: new URL("@/assets/svg/玄幻言情.svg", import.meta.url).href,
   穿越: new URL("@/assets/svg/穿越.svg", import.meta.url).href,
+  青春文学: new URL("@/assets/svg/青春文学.svg", import.meta.url).href,
+  轻小说: new URL("@/assets/svg/轻小说.svg", import.meta.url).href,
+  韩娱小说: new URL("@/assets/svg/韩娱小说.svg", import.meta.url).href,
+  现代都市: new URL("@/assets/svg/现代都市.svg", import.meta.url).href,
+  现实: new URL("@/assets/svg/现实.svg", import.meta.url).href,
 };
 
 interface BookState {
@@ -37,11 +42,6 @@ interface BookState {
   loading: boolean;
   error: string | null;
   searchSuggestions: Book[];
-}
-
-interface Category {
-  name: string;
-  bookCount?: number;
 }
 
 export const useBookStore = defineStore("books", {
@@ -90,6 +90,7 @@ export const useBookStore = defineStore("books", {
         const data = await bookApi.getBooks({
           page: 1,
           page_size: 6,
+          type: "latest",
         });
         this.latestBooks = data.items;
       } catch (error: any) {
@@ -107,6 +108,7 @@ export const useBookStore = defineStore("books", {
         const data = await bookApi.getBooks({
           page: 1,
           page_size: 6,
+          type: "hotest",
         });
         this.popularBooks = data.items;
       } catch (error: any) {
@@ -159,6 +161,64 @@ export const useBookStore = defineStore("books", {
       } catch (error: any) {
         console.error("获取搜索建议失败:", error);
         this.searchSuggestions = [];
+      }
+    },
+
+    async getBooksByCategory(category: string) {
+      this.loading = true;
+      this.error = null;
+      console.log("category", category);
+      try {
+        const data = await bookApi.getBooks({
+          page: 1,
+          page_size: 10,
+          sort: category,
+        });
+        return data;
+      } catch (error: any) {
+        this.error = error.message;
+        console.error("获取分类书籍失败:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getLatestBooks(page: number, pageSize: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await bookApi.getBooks({
+          page,
+          page_size: pageSize,
+          type: "latest",
+        });
+        return data;
+      } catch (error: any) {
+        this.error = error.message;
+        console.error("获取最新书籍失败:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getPopularBooks(page: number, pageSize: number) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await bookApi.getBooks({
+          page,
+          page_size: pageSize,
+          type: "hotest",
+        });
+        return data;
+      } catch (error: any) {
+        this.error = error.message;
+        console.error("获取热门书籍失败:", error);
+        throw error;
+      } finally {
+        this.loading = false;
       }
     },
   },

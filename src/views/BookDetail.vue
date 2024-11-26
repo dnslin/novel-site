@@ -56,6 +56,9 @@ const handleRateWithAnimation = async (ratingTypeId: number) => {
 
 // 获取数据
 onMounted(async () => {
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+
   try {
     // 获取书籍详情
     const response = await bookStore.getBookDetail(bookId)
@@ -98,7 +101,6 @@ const formatDate = (dateStr: string): string => {
     day: 'numeric'
   })
 }
-
 // 文件下载函数
 const downloadBook = async () => {
   if (!book.value?.file_url) return
@@ -107,12 +109,12 @@ const downloadBook = async () => {
   downloadProgress.value = 0
 
   try {
+    // 使用 book.value.file_size 作为文件大小
+    const totalSize = book.value.file_size
+    let receivedLength = 0
+
     const response = await fetch(book.value.file_url)
     if (!response.ok) throw new Error('Download failed')
-
-    // 获取文件大小
-    const contentLength = Number(response.headers.get('content-length'))
-    let receivedLength = 0
 
     // 创建可读流
     const reader = response.body?.getReader()
@@ -129,8 +131,8 @@ const downloadBook = async () => {
       chunks.push(value)
       receivedLength += value.length
 
-      // 更新进度
-      downloadProgress.value = Math.round((receivedLength / contentLength) * 100)
+      // 使用 totalSize 计算进度
+      downloadProgress.value = Math.round((receivedLength / totalSize) * 100)
     }
 
     // 合并所有chunks并创建Blob

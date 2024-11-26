@@ -16,7 +16,6 @@ import {
   ArrowPathIcon,
   StarIcon,
   FireIcon,
-  CheckCircleIcon
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'

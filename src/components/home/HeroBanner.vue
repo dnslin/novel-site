@@ -27,21 +27,17 @@ defineProps<{
 <template>
     <div class="hero-section py-24 relative overflow-visible">
         <!-- 背景图层 -->
-        <div class="absolute inset-0 w-full h-full overflow-hidden rounded-xl">
+        <div class="absolute inset-0 w-full h-full overflow-hidden rounded-xl z-[30]">
             <img src="@/assets/blob-scene-light.svg" alt="background"
-                class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
-                    { 'opacity-0': isDark, 'opacity-100': !isDark },
-                    { 'scale-105': bgTransitioning }
-                ]" />
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                :class="{ 'opacity-0': isDark || bgTransitioning }" />
             <img src="@/assets/blob-scene-black.svg" alt="background"
-                class="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500" :class="[
-                    { 'opacity-100': isDark, 'opacity-0': !isDark },
-                    { 'scale-105': bgTransitioning }
-                ]" />
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                :class="{ 'opacity-0': !isDark || bgTransitioning }" />
         </div>
 
         <!-- 内容区域 -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[40]">
             <!-- 主标题 -->
             <h1 class="text-5xl font-bold mb-6 text-gray-800 dark:text-white">
                 <span class="block typewriter-container">{{ displayedMainTitle }}</span>
@@ -56,7 +52,7 @@ defineProps<{
         </div>
 
         <!-- 搜索框插槽 -->
-        <div class="absolute left-0 right-0 bottom-20 z-20">
+        <div class="absolute left-0 right-0 bottom-20 z-[50]">
             <slot name="search"></slot>
         </div>
     </div>
@@ -66,6 +62,7 @@ defineProps<{
 .hero-section {
     position: relative;
     min-height: 400px;
+    z-index: 20;
 }
 
 /* 确保图片过渡效果平滑 */

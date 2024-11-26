@@ -42,11 +42,13 @@ onMounted(async () => {
     <div class="min-h-screen">
         <!-- 内容区域 -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-16 mb-24">
-            <div class="relative z-40">
+            <div class="relative">
                 <HeroBanner :main-title="mainTitle" :sub-title="subTitle" :displayed-main-title="displayedMainTitle"
                     :displayed-sub-title="displayedSubTitle" :show-sub-title="showSubTitle">
                     <template #search>
-                        <SearchBox />
+                        <div class="relative z-[60]">
+                            <SearchBox />
+                        </div>
                     </template>
                 </HeroBanner>
             </div>

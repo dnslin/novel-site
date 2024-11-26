@@ -35,9 +35,12 @@ const handleSuggestionClick = (book: Book) => {
 
 // 处理搜索框失焦
 const handleSearchBlur = () => {
-    setTimeout(() => {
-        showSuggestions.value = false
-    }, 200)
+    // 使用 requestAnimationFrame 确保在下一帧处理
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            showSuggestions.value = false
+        }, 200)
+    })
 }
 
 // 监听搜索关键词变化
@@ -51,46 +54,48 @@ watch(searchKeyword, (newValue) => {
 })
 </script>
 <template>
-    <div class="max-w-2xl mx-auto relative animate-search">
-        <input type="text" v-model="searchKeyword" @focus="showSuggestions = true" @blur="handleSearchBlur" class="w-full pl-6 pr-12 py-4 rounded-full 
-             transition-colors duration-300
-             border focus:outline-none focus:ring-2
-             dark:placeholder:text-gray-400
-             dark:text-white text-gray-700
-             bg-white/20 dark:bg-gray-900/20
-             backdrop-blur-sm
-             border-gray-300 dark:border-gray-600/30
-             focus:ring-primary/50 dark:focus:ring-primary-light/50" placeholder="搜索你感兴趣的书籍、作者..." />
+    <div class="max-w-2xl mx-auto relative">
+        <div class="relative">
+            <input type="text" v-model="searchKeyword" @focus="showSuggestions = true" @blur="handleSearchBlur" class="w-full pl-6 pr-12 py-4 rounded-full 
+                 transition-colors duration-300
+                 border focus:outline-none focus:ring-2
+                 dark:placeholder:text-gray-400
+                 dark:text-white text-gray-700
+                 bg-white/20 dark:bg-gray-900/20
+                 backdrop-blur-sm
+                 border-gray-300 dark:border-gray-600/30
+                 focus:ring-primary/50 dark:focus:ring-primary-light/50" placeholder="搜索你感兴趣的书籍、作者..." />
 
-        <!-- 搜索建议下拉框 -->
-        <div v-if="showSuggestions && searchSuggestions.length > 0" class="absolute left-0 right-0 mt-2 py-2 
-                bg-white dark:bg-gray-800 
-                rounded-lg shadow-lg border border-gray-200 
-                dark:border-gray-700 z-[999] min-w-full">
-            <!-- 搜索建议列表 -->
-            <div v-for="book in searchSuggestions" :key="book.id" @mousedown="handleSuggestionClick(book)" class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                  cursor-pointer flex items-center space-x-3
-                  transition-colors duration-200">
-                <img v-if="book.cover" :src="book.cover" :alt="book.title" class="w-10 h-14 object-cover rounded" />
-                <div class="flex-1">
-                    <div class="text-gray-900 dark:text-white font-medium">
-                        {{ book.title }}
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ book.author }}
+            <!-- 搜索建议下拉框 -->
+            <div v-show="showSuggestions && searchSuggestions.length > 0" class="absolute left-0 right-0 mt-2 py-2 
+                    bg-white dark:bg-gray-800 
+                    rounded-lg shadow-lg border border-gray-200 
+                    dark:border-gray-700 z-[70] min-w-full">
+                <!-- 搜索建议列表 -->
+                <div v-for="book in searchSuggestions" :key="book.id" @mousedown="handleSuggestionClick(book)" class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                      cursor-pointer flex items-center space-x-3
+                      transition-colors duration-200">
+                    <img v-if="book.cover" :src="book.cover" :alt="book.title" class="w-10 h-14 object-cover rounded" />
+                    <div class="flex-1">
+                        <div class="text-gray-900 dark:text-white font-medium">
+                            {{ book.title }}
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ book.author }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 搜索按钮 -->
-        <button @click="handleSearchBlur" class="absolute right-4 top-1/2 -translate-y-1/2 
-                   text-white/60 hover:text-white 
-                   transition-colors duration-300">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-        </button>
+            <!-- 搜索按钮 -->
+            <button @click="handleSearchBlur" class="absolute right-4 top-1/2 -translate-y-1/2 
+                       text-white/60 hover:text-white 
+                       transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+        </div>
     </div>
 </template>

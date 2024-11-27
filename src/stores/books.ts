@@ -225,5 +225,9 @@ export const useBookStore = defineStore("books", {
         this.loading = false;
       }
     },
+
+    clearSearchSuggestions() {
+      this.searchSuggestions = [];
+    },
   },
 });

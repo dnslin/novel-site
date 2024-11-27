@@ -2,11 +2,9 @@
 import {
     ClipboardDocumentCheckIcon,
     UserIcon,
-    ShieldCheckIcon,
     CogIcon,
     ExclamationTriangleIcon,
     DocumentTextIcon,
-    ScaleIcon
 } from '@heroicons/vue/24/outline'
 </script>
 

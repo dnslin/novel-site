@@ -5,8 +5,7 @@ import {
     ShieldCheckIcon,
     FingerPrintIcon,
     CloudIcon,
-    LockClosedIcon,
-    ExclamationTriangleIcon
+    LockClosedIcon
 } from '@heroicons/vue/24/outline'
 </script>
 

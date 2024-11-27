@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { BookOpenIcon, FireIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import type { Book } from '@/types'
-import LazyImage from '@/components/common/LazyImage.vue'
 
-// 确保 BookList 组件不会覆盖父组件的分页逻辑
-const props = defineProps<{
+defineProps<{
     books: Book[]
     loading?: boolean
     showCategory?: boolean
@@ -126,8 +124,13 @@ const props = defineProps<{
 /* 文本截断 */
 .line-clamp-1 {
     display: -webkit-box;
+    display: flex;
     -webkit-line-clamp: 1;
+    -moz-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    box-orient: vertical;
     overflow: hidden;
 }
 </style>

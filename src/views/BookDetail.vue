@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBookStore } from '@/stores/books'
 import { useRatingStore } from '@/stores/ratings'
@@ -13,12 +13,14 @@ import {
   UserIcon,
   TagIcon,
   DocumentTextIcon,
-  ArrowPathIcon,
   StarIcon,
   FireIcon,
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'
+import DownloadProgress from '@/components/book/DownloadProgress.vue'
+import ShareBook from '@/components/book/ShareBook.vue'
+import { useFileDownload } from '@/utils/download'
 
 const route = useRoute()
 const bookStore = useBookStore()
@@ -30,9 +32,7 @@ const book = ref<BookDetail | null>(null)
 const { loading: ratingLoading } = storeToRefs(ratingStore)
 const commentText = ref('')
 
-// 添加下载相关的状态
-const downloading = ref(false)
-const downloadProgress = ref(0)
+const { downloading, progress: downloadProgress, download } = useFileDownload()
 
 // 添加收藏状态
 const isCollected = ref(false)
@@ -107,66 +107,53 @@ const formatDate = (dateStr: string): string => {
 const downloadBook = async () => {
   if (!book.value?.file_url) return
 
-  downloading.value = true
-  downloadProgress.value = 0
-
-  try {
-    // 使用 book.value.file_size 作为文件大小
-    const totalSize = book.value.file_size
-    let receivedLength = 0
-
-    const response = await fetch(book.value.file_url)
-    if (!response.ok) throw new Error('Download failed')
-
-    // 创建可读流
-    const reader = response.body?.getReader()
-    if (!reader) throw new Error('Failed to create reader')
-
-    // 创建新的 Blob
-    const chunks: Uint8Array[] = []
-
-    while (true) {
-      const { done, value } = await reader.read()
-
-      if (done) break
-
-      chunks.push(value)
-      receivedLength += value.length
-
-      // 使用 totalSize 计算进度
-      downloadProgress.value = Math.round((receivedLength / totalSize) * 100)
+  await download({
+    url: book.value.file_url,
+    fileName: book.value.file_name || 'download.txt',
+    fileSize: book.value.file_size,
+    onProgress: (progress) => {
+      console.log(`Download progress: ${progress}%`)
     }
-
-    // 合并所有chunks并创建Blob
-    const blob = new Blob(chunks)
-
-    // 创建下载链接
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = book.value.file_name || 'download.txt' // 使用服务器返回的文件名
-    document.body.appendChild(a)
-    a.click()
-
-    // 清理
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-
-  } catch (error) {
-    console.error('下载失败:', error)
-    toast.error("下载失败，请稍后重试")
-  } finally {
-    downloading.value = false
-    downloadProgress.value = 0
-  }
+  })
 }
+
+// 获取当前页面URL用于分享
+const pageUrl = computed(() => {
+  if (typeof window !== 'undefined') {
+    return window.location.href
+  }
+  return ''
+})
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- 书籍详情卡片 -->
-    <div v-if="book" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300
-                hover:shadow-xl transform hover:-translate-y-1">
+    <!-- 添加骨架屏 -->
+    <div v-if="!book" class="animate-pulse">
+      <!-- 移动端骨架屏 -->
+      <div class="md:hidden">
+        <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+        <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+      </div>
+
+      <!-- 桌面端骨架屏 -->
+      <div class="hidden md:flex gap-8">
+        <div class="w-64 h-96 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        <div class="flex-1">
+          <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
+          <div class="space-y-4">
+            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 书籍详情内容 -->
+    <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       <!-- 移动端封面和标题 -->
       <div class="md:hidden">
         <div class="relative w-full pb-[56.25%]">
@@ -174,8 +161,77 @@ const downloadBook = async () => {
             class="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div class="p-4">
-          <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ book.title }}</h1>
-          <p class="text-gray-600 dark:text-gray-400">{{ book.author }}</p>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ book.title }}</h1>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">{{ book.author }}</p>
+
+          <!-- 添加移动端标签 -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
+                         text-primary dark:text-primary-light">
+              {{ book.sort }}
+            </span>
+            <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
+                         text-primary dark:text-primary-light">
+              {{ book.tag }}
+            </span>
+          </div>
+
+          <!-- 添加移动端统计数据 -->
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <FireIcon class="w-4 h-4 text-orange-500" />
+              <span>热度: {{ book.hot_value }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <CloudArrowDownIcon class="w-4 h-4 text-blue-500" />
+              <span>下载: {{ book.downloads }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <DocumentTextIcon class="w-4 h-4 text-green-500" />
+              <span>大小: {{ formatFileSize(book.file_size) }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <CalendarIcon class="w-4 h-4 text-purple-500" />
+              <span>{{ formatDate(book.created_at) }}</span>
+            </div>
+          </div>
+
+          <!-- 添加移动端简介 -->
+          <p class="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
+            {{ book.intro }}
+          </p>
+
+          <!-- 添加移动端操作按钮 -->
+          <div class="flex flex-col gap-3">
+            <!-- 下载进度条 -->
+            <div v-if="downloading" class="w-full">
+              <DownloadProgress :progress="downloadProgress" :downloading="downloading" @retry="downloadBook" />
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="grid grid-cols-3 gap-3">
+              <button @click="downloadBook" :disabled="downloading" class="flex items-center justify-center px-4 py-2 
+                       bg-primary hover:bg-primary-dark dark:bg-primary-light 
+                       dark:hover:bg-primary text-white rounded-lg 
+                       transition-colors duration-300 text-sm">
+                <CloudArrowDownIcon class="w-4 h-4" />
+                <span class="ml-1">{{ downloading ? '下载中' : '下载' }}</span>
+              </button>
+
+              <button @click="toggleCollect" class="flex items-center justify-center px-4 py-2 
+                       border border-gray-300 dark:border-gray-600 
+                       text-gray-700 dark:text-gray-300 rounded-lg 
+                       hover:bg-gray-50 dark:hover:bg-gray-700/50 
+                       transition-colors duration-300 text-sm">
+                <HeartIcon v-if="!isCollected" class="w-4 h-4" />
+                <HeartSolidIcon v-else class="w-4 h-4 text-red-500" />
+                <span class="ml-1">{{ isCollected ? '已收藏' : '收藏' }}</span>
+              </button>
+
+              <ShareBook :title="book.title" :author="book.author" :description="book.description || ''" :url="pageUrl"
+                class="text-sm" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -259,30 +315,32 @@ const downloadBook = async () => {
                         pointer-events-none"></div>
           </div>
 
-          <!-- 操作按钮 -->
+          <!-- 修改操作按钮部分 -->
           <div class="flex flex-wrap gap-4">
-            <button @click="downloadBook" :disabled="downloading"
-              class="flex items-center px-6 py-2.5 bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white rounded-lg transition-colors duration-300 shadow-sm hover:shadow-md disabled:opacity-80 disabled:cursor-wait relative overflow-hidden group">
-              <div class="flex items-center">
-                <ArrowPathIcon v-if="downloading" class="w-5 h-5 mr-2 animate-spin" />
-                <CloudArrowDownIcon v-else class="w-5 h-5 mr-2 group-hover:-translate-y-1 transition-transform" />
-                <span>{{ downloading ? `下载中 ${downloadProgress}%` : '下载' }}</span>
-              </div>
+            <div class="w-full" v-if="downloading">
+              <DownloadProgress :progress="downloadProgress" :downloading="downloading" @retry="downloadBook" />
+            </div>
 
-              <!-- 进度条 -->
-              <div v-if="downloading"
-                class="absolute bottom-0 left-0 h-1 bg-white/30 transition-all duration-300 ease-out"
-                :style="{ width: `${downloadProgress}%` }">
-                <div class="absolute right-0 top-0 h-full w-2 bg-white/50 animate-pulse"></div>
-              </div>
+            <button @click="downloadBook" :disabled="downloading" class="flex-1 md:flex-none flex items-center justify-center px-6 py-2.5 
+                     bg-primary hover:bg-primary-dark dark:bg-primary-light 
+                     dark:hover:bg-primary text-white rounded-lg transition-colors 
+                     duration-300 shadow-sm hover:shadow-md disabled:opacity-80 
+                     disabled:cursor-wait">
+              <CloudArrowDownIcon class="w-5 h-5 mr-2" />
+              <span>{{ downloading ? '下载中...' : '下载' }}</span>
             </button>
 
-            <button @click="toggleCollect"
-              class="flex items-center px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-300 group">
-              <HeartSolidIcon v-if="isCollected" class="w-5 h-5 mr-2 text-red-500 animate-bounce" />
-              <HeartIcon v-else class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+            <button @click="toggleCollect" class="flex-1 md:flex-none flex items-center justify-center px-6 py-2.5 
+                     border border-gray-300 dark:border-gray-600 
+                     text-gray-700 dark:text-gray-300 rounded-lg 
+                     hover:bg-gray-50 dark:hover:bg-gray-700/50 
+                     transition-colors duration-300">
+              <HeartIcon v-if="!isCollected" class="w-5 h-5 mr-2" />
+              <HeartSolidIcon v-else class="w-5 h-5 mr-2 text-red-500" />
               {{ isCollected ? '已收藏' : '收藏' }}
             </button>
+
+            <ShareBook :title="book.title" :author="book.author" :description="book.description || ''" :url="pageUrl" />
           </div>
         </div>
       </div>
@@ -345,6 +403,19 @@ const downloadBook = async () => {
   50% {
     transform: scale(1.1);
     opacity: 0.8;
+  }
+}
+
+/* 添加移动端响应式样式 */
+@media (max-width: 640px) {
+  .hero-section {
+    min-height: 300px;
+  }
+
+  .book-cover {
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
   }
 }
 </style>

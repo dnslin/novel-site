@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BookOpenIcon, FireIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import type { Book } from '@/types'
+import LazyImage from '@/components/common/LazyImage.vue'
 
 defineProps<{
     title: string
@@ -44,11 +45,8 @@ defineProps<{
                         </div>
 
                         <!-- 图片 -->
-                        <img v-if="book.cover" :src="book.cover" :alt="book.title" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-105 
-                                    transition-all duration-300 opacity-0 animate-fade-in" @load="(e) => {
-                                        const img = e.target as HTMLImageElement;
-                                        img.classList.remove('opacity-0');
-                                    }" />
+                        <img :src="book.cover || '/placeholder.jpg'" :alt="book.title" loading="lazy"
+                            class="w-24 h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" />
                     </div>
 
                     <!-- 书籍信息 -->

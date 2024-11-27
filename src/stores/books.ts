@@ -168,16 +168,25 @@ export const useBookStore = defineStore("books", {
       }
     },
 
-    async getBooksByCategory(category: string) {
+    async getBooksByCategory(
+      category: string,
+      page: number = 1,
+      pageSize: number = 12
+    ) {
       this.loading = true;
       this.error = null;
-      console.log("category", category);
       try {
+        console.log("Fetching category books with params:", {
+          category,
+          page,
+          pageSize,
+        });
         const data = await bookApi.getBooks({
-          page: 1,
-          page_size: 10,
+          page,
+          page_size: pageSize,
           sort: category,
         });
+        console.log("Received data:", data);
         return data;
       } catch (error: any) {
         this.error = error.message;

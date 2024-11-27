@@ -3,12 +3,15 @@ import { BookOpenIcon, FireIcon, ChevronRightIcon } from '@heroicons/vue/24/outl
 import type { Book } from '@/types'
 import LazyImage from '@/components/common/LazyImage.vue'
 
-defineProps<{
+// 确保 BookList 组件不会覆盖父组件的分页逻辑
+const props = defineProps<{
+    books: Book[]
+    loading?: boolean
+    showCategory?: boolean
     title: string
     icon: 'book' | 'fire'
-    books: Book[]
-    loading: boolean
-    moreLink: string
+    moreLink?: string | null  // 修改类型，允许为 null
+    showMore?: boolean  // 添加新属性控制更多按钮的显示
 }>()
 </script>
 
@@ -21,7 +24,7 @@ defineProps<{
                 <FireIcon v-else class="w-7 h-7 mr-2" />
                 {{ title }}
             </h2>
-            <router-link :to="moreLink"
+            <router-link v-if="showMore && moreLink" :to="moreLink"
                 class="text-primary dark:text-primary-light hover:text-primary-dark dark:hover:text-primary-light/80 transition-colors flex items-center">
                 更多
                 <ChevronRightIcon class="w-4 h-4 ml-1" />

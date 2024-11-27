@@ -55,8 +55,10 @@ onMounted(async () => {
             <CategoryNav />
 
             <div class="grid lg:grid-cols-2 gap-8">
-                <BookList title="最新上传" icon="book" :books="latestBooks" :loading="loading" more-link="/latest" />
-                <BookList title="热门推荐" icon="fire" :books="popularBooks" :loading="loading" more-link="/popular" />
+                <BookList title="最新上传" icon="book" :books="latestBooks" :loading="loading" more-link="/latest"
+                    :show-more="true" />
+                <BookList title="热门推荐" icon="fire" :books="popularBooks" :loading="loading" more-link="/popular"
+                    :show-more="true" />
             </div>
         </div>
     </div>

@@ -37,6 +37,21 @@ const router = createRouter({
       name: "popular",
       component: () => import("../views/Popular.vue"),
     },
+    {
+      path: "/about",
+      name: "about",
+      component: () => import("../views/About.vue"),
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: () => import("../views/Terms.vue"),
+    },
+    {
+      path: "/privacy",
+      name: "privacy",
+      component: () => import("../views/Privacy.vue"),
+    },
   ],
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {

@@ -1,8 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
-import BookDetail from "../views/BookDetail.vue";
-import Categories from "../views/Categories.vue";
-import CategoryDetail from "../views/CategoryDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -10,22 +6,22 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: Home,
+      component: () => import("../views/Home.vue"),
     },
     {
       path: "/books/:id",
       name: "book-detail",
-      component: BookDetail,
+      component: () => import("../views/BookDetail.vue"),
     },
     {
       path: "/categories",
       name: "categories",
-      component: Categories,
+      component: () => import("../views/Categories.vue"),
     },
     {
       path: "/category/:name",
       name: "category-detail",
-      component: CategoryDetail,
+      component: () => import("../views/CategoryDetail.vue"),
     },
     {
       path: "/latest",
@@ -51,6 +47,11 @@ const router = createRouter({
       path: "/privacy",
       name: "privacy",
       component: () => import("../views/Privacy.vue"),
+    },
+    {
+      path: "/ranking",
+      name: "ranking",
+      component: () => import("../views/Ranking.vue"),
     },
   ],
   scrollBehavior(_to, _from, savedPosition) {

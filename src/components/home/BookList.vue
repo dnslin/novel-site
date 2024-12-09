@@ -40,13 +40,13 @@ defineProps<{
                                    animate-shimmer" style="background-size: 200% 100%;"></div>
 
                         <!-- 默认占位图标 -->
-                        <div v-if="!book.cover"
+                        <div v-if="!book.coverUrl"
                             class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
                             <BookOpenIcon class="w-12 h-12" />
                         </div>
 
                         <!-- 图片 -->
-                        <img :src="book.cover || '/placeholder.jpg'" :alt="book.title" loading="lazy"
+                        <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" loading="lazy"
                             class="w-24 h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" />
                     </div>
 
@@ -54,13 +54,13 @@ defineProps<{
                     <div class="flex-1 p-4">
                         <h3 class="font-medium mb-2 group-hover:text-primary dark:text-white 
                                   transition-colors line-clamp-1">
-                            {{ book.title }}
+                            {{ book.bookName }}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ book.author }}</p>
                         <div class="mt-2 flex items-center gap-2 text-xs">
                             <span class="px-2 py-1 rounded-full bg-primary/10 text-primary 
                                        dark:bg-primary/20 dark:text-primary-light">
-                                {{ book.sort }}
+                                {{ book.category }}
                             </span>
                             <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 
                                        dark:bg-gray-600 dark:text-gray-300">

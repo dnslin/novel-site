@@ -1,5 +1,11 @@
 import instance from "./instance";
-import type { Book, BookDetail, BookQuery, PaginatedResponse } from "@/types";
+import type {
+  Book,
+  BookDetail,
+  BookQuery,
+  PaginatedResponse,
+  ApiResponse,
+} from "@/types";
 
 export const bookApi = {
   // 获取书籍列表
@@ -23,7 +29,7 @@ export const bookApi = {
 
   // 添加获取分类接口
   getBookSorts() {
-    return instance.get<never, { sorts: string[] }>("/books/sorts");
+    return instance.get<never, string[]>("/books/categories");
   },
 
   // 添加搜索建议接口
@@ -31,5 +37,15 @@ export const bookApi = {
     return instance.post<never, PaginatedResponse<Book>>("/books/search", {
       keyword,
     });
+  },
+
+  // 获取最新书籍
+  getLatestBooks(limit: number = 10) {
+    return instance.get<never, Book[]>(`/books/latest?limit=${limit}`);
+  },
+
+  // 获取热门书籍
+  getPopularBooks(limit: number = 10) {
+    return instance.get<never, Book[]>(`/books/hot?limit=${limit}`);
   },
 };

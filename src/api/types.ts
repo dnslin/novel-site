@@ -2,7 +2,7 @@
 export interface ApiResponse<T = any> {
   code: number;
   message?: string;
-  data: T;
+  result: T;
 }
 
 // 分页请求参数

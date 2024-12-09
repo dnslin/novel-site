@@ -212,11 +212,11 @@ onUnmounted(() => {
                     class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     :class="{ 'bg-gray-100 dark:bg-gray-700': selectedIndex === index + searchHistory.length }">
                     <div class="flex items-center space-x-3">
-                        <img v-if="book.cover" :src="book.cover" :alt="book.title"
+                        <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName"
                             class="w-10 h-14 object-cover rounded" />
                         <div class="flex-1">
                             <div class="text-gray-900 dark:text-white font-medium">
-                                {{ book.title }}
+                                {{ book.bookName }}
                             </div>
                             <div class="text-sm text-gray-500 dark:text-gray-400">
                                 {{ book.author }}

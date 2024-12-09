@@ -68,56 +68,17 @@ export const useBookStore = defineStore("books", {
       this.loading = true;
       this.error = null;
       try {
-        const { sorts } = await bookApi.getBookSorts();
-        this.allCategories = sorts;
+        const result = await bookApi.getBookSorts();
+        this.allCategories = result;
 
         // 转换为带图标的分类数组
-        this.categories = sorts.map((sort) => ({
+        this.categories = result.map((sort) => ({
           name: sort,
           icon: SORT_ICONS[sort] || SORT_ICONS.default,
         }));
       } catch (error: any) {
         this.error = error.message;
         console.error("获取分类失败:", error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async fetchLatestBooks() {
-      const toast = useToast();
-      this.loading = true;
-      this.error = null;
-      try {
-        const data = await bookApi.getBooks({
-          page: 1,
-          page_size: 6,
-          type: "latest",
-        });
-        this.latestBooks = data.items;
-        return data;
-      } catch (error: any) {
-        this.error = error.message;
-        toast.error("获取最新书籍失败");
-        throw error;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async fetchPopularBooks() {
-      this.loading = true;
-      this.error = null;
-      try {
-        const data = await bookApi.getBooks({
-          page: 1,
-          page_size: 6,
-          type: "hotest",
-        });
-        this.popularBooks = data.items;
-      } catch (error: any) {
-        this.error = error.message;
-        console.error("获取热门书籍失败:", error);
       } finally {
         this.loading = false;
       }
@@ -197,42 +158,57 @@ export const useBookStore = defineStore("books", {
       }
     },
 
-    async getLatestBooks(page: number, pageSize: number) {
+    async getLatestBooks(page: number, pageSize: number = 6) {
       this.loading = true;
       this.error = null;
       try {
-        const data = await bookApi.getBooks({
-          page,
-          page_size: pageSize,
-          type: "latest",
-        });
-        return data;
+        const result = await bookApi.getLatestBooks(pageSize);
+        console.log("Latest books result:", result);
+
+        this.latestBooks = result;
+        return {
+          items: result,
+          total: result.length,
+        };
       } catch (error: any) {
         this.error = error.message;
         console.error("获取最新书籍失败:", error);
+        this.latestBooks = [];
         throw error;
       } finally {
         this.loading = false;
       }
     },
 
-    async getPopularBooks(page: number, pageSize: number) {
+    async getPopularBooks(page: number, pageSize: number = 6) {
       this.loading = true;
       this.error = null;
       try {
-        const data = await bookApi.getBooks({
-          page,
-          page_size: pageSize,
-          type: "hotest",
-        });
-        return data;
+        const result = await bookApi.getPopularBooks(pageSize);
+        console.log("Popular books result:", result);
+
+        this.popularBooks = result;
+        return {
+          items: result,
+          total: result.length,
+        };
       } catch (error: any) {
         this.error = error.message;
         console.error("获取热门书籍失败:", error);
+        this.popularBooks = [];
         throw error;
       } finally {
         this.loading = false;
       }
+    },
+
+    // 为了保持兼容性
+    fetchLatestBooks() {
+      return this.getLatestBooks(1, 6);
+    },
+
+    fetchPopularBooks() {
+      return this.getPopularBooks(1, 6);
     },
 
     clearSearchSuggestions() {

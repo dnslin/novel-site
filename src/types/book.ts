@@ -12,12 +12,22 @@ export interface BookQuery extends PaginationQuery {
 // 书籍列表项
 export interface Book {
   id: number;
-  title: string;
+  bookName: string;
   author: string;
-  cover?: string;
   description?: string;
-  sort?: string;
+  coverUrl?: string;
   tag?: string;
+  hotValue?: number;
+  category?: string;
+  subCategory?: string;
+  wordCount?: string;
+  readCount?: number;
+  bookStatus?: string;
+  Source?: string;
+  listenCount?: number;
+  subInfo?: string;
+  lastPublishTime?: string;
+  hasDownload?: boolean;
 }
 
 // 书籍详情

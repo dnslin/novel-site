@@ -157,18 +157,20 @@ const pageUrl = computed(() => {
       <!-- 移动端封面和标题 -->
       <div class="md:hidden">
         <div class="relative w-full pb-[56.25%]">
-          <img :src="book.cover || '/placeholder.jpg'" :alt="book.title"
+          <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
             class="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div class="p-4">
-          <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ book.title }}</h1>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {{ book.bookName }}
+          </h1>
           <p class="text-gray-600 dark:text-gray-400 mb-4">{{ book.author }}</p>
 
           <!-- 添加移动端标签 -->
           <div class="flex flex-wrap gap-2 mb-4">
             <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
                          text-primary dark:text-primary-light">
-              {{ book.sort }}
+              {{ book.category }}
             </span>
             <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
                          text-primary dark:text-primary-light">
@@ -228,7 +230,7 @@ const pageUrl = computed(() => {
                 <span class="ml-1">{{ isCollected ? '已收藏' : '收藏' }}</span>
               </button>
 
-              <ShareBook :title="book.title" :author="book.author" :description="book.description || ''" :url="pageUrl"
+              <ShareBook :title="book.bookName" :author="book.author" :description="book.intro || ''" :url="pageUrl"
                 class="text-sm" />
             </div>
           </div>
@@ -240,7 +242,7 @@ const pageUrl = computed(() => {
         <!-- 封面 - 添加悬停效果 -->
         <div class="w-64 flex-shrink-0 group">
           <div class="relative overflow-hidden rounded-lg">
-            <img :src="book.cover || '/placeholder.jpg'" :alt="book.title"
+            <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
               class="w-full transition-transform duration-500 group-hover:scale-110" />
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
                       transition-opacity duration-300 flex items-center justify-center">
@@ -253,7 +255,7 @@ const pageUrl = computed(() => {
         <!-- 主要信息 -->
         <div class="flex-grow">
           <div class="flex items-center gap-4 mb-3">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ book.title }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ book.bookName }}</h1>
             <StarIcon class="w-6 h-6 text-yellow-400 animate-pulse" v-if="book.hot_value > 1000" />
           </div>
 
@@ -267,7 +269,7 @@ const pageUrl = computed(() => {
             <span
               class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
               <TagIcon class="w-4 h-4" />
-              {{ book.sort }}
+              {{ book.category }}
             </span>
             <span
               class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
@@ -340,7 +342,7 @@ const pageUrl = computed(() => {
               {{ isCollected ? '已收藏' : '收藏' }}
             </button>
 
-            <ShareBook :title="book.title" :author="book.author" :description="book.description || ''" :url="pageUrl" />
+            <ShareBook :title="book.bookName" :author="book.author" :description="book.intro || ''" :url="pageUrl" />
           </div>
         </div>
       </div>

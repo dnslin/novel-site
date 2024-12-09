@@ -19,9 +19,8 @@ export default defineConfig({
     proxy: {
       // 配置代理
       "/api": {
-        target: "http://localhost:8100/v1", // 后端服务地址
+        target: "http://localhost:12341", // 移除多余的 /api
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""), // 移除 /api 前缀
       },
     },
   },

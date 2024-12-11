@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BookOpenIcon, FireIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import type { Book } from '@/types'
+import HeicImage from '@/components/common/HeicImage.vue'
 
 defineProps<{
     books: Book[]
@@ -46,8 +47,9 @@ defineProps<{
                         </div>
 
                         <!-- 图片 -->
-                        <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" loading="lazy"
-                            class="w-24 h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" />
+                        <HeicImage v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName"
+                            class="w-24 h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            placeholder="/placeholder.jpg" />
                     </div>
 
                     <!-- 书籍信息 -->

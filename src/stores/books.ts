@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { bookApi } from "@/api";
 import type { Book } from "@/types";
-import { useToast } from "vue-toastification";
 
 // 定义分类图标映射
 const SORT_ICONS: Record<string, string> = {
@@ -17,6 +16,7 @@ const SORT_ICONS: Record<string, string> = {
   仙侠: new URL("@/assets/svg/仙侠.svg", import.meta.url).href,
   军事: new URL("@/assets/svg/军事.svg", import.meta.url).href,
   奇幻: new URL("@/assets/svg/奇幻.svg", import.meta.url).href,
+  修真: new URL("@/assets/svg/修真.svg", import.meta.url).href,
   现代言情: new URL("@/assets/svg/现代言情.svg", import.meta.url).href,
   游戏竞技: new URL("@/assets/svg/竞技.svg", import.meta.url).href,
   古代言情: new URL("@/assets/svg/古代言情.svg", import.meta.url).href,
@@ -30,6 +30,28 @@ const SORT_ICONS: Record<string, string> = {
   韩娱小说: new URL("@/assets/svg/韩娱小说.svg", import.meta.url).href,
   现代都市: new URL("@/assets/svg/现代都市.svg", import.meta.url).href,
   现实: new URL("@/assets/svg/现实.svg", import.meta.url).href,
+  仙侠奇缘: new URL("@/assets/svg/仙侠奇缘.svg", import.meta.url).href,
+  乡村: new URL("@/assets/svg/乡村.svg", import.meta.url).href,
+  二次元: new URL("@/assets/svg/二次元.svg", import.meta.url).href,
+  其他: new URL("@/assets/svg/其他.svg", import.meta.url).href,
+  同人: new URL("@/assets/svg/同人.svg", import.meta.url).href,
+  搞笑: new URL("@/assets/svg/搞笑.svg", import.meta.url).href,
+  无限: new URL("@/assets/svg/无限.svg", import.meta.url).href,
+  星际: new URL("@/assets/svg/星际.svg", import.meta.url).href,
+  末世: new URL("@/assets/svg/末世.svg", import.meta.url).href,
+  校园: new URL("@/assets/svg/校园.svg", import.meta.url).href,
+  灵异: new URL("@/assets/svg/灵异.svg", import.meta.url).href,
+  爽文: new URL("@/assets/svg/爽文.svg", import.meta.url).href,
+  电竞: new URL("@/assets/svg/电竞.svg", import.meta.url).href,
+  番茄言情: new URL("@/assets/svg/番茄言情.svg", import.meta.url).href,
+  种田: new URL("@/assets/svg/种田.svg", import.meta.url).href,
+  空间: new URL("@/assets/svg/空间.svg", import.meta.url).href,
+  系统: new URL("@/assets/svg/系统.svg", import.meta.url).href,
+  综漫: new URL("@/assets/svg/综漫.svg", import.meta.url).href,
+  美食: new URL("@/assets/svg/美食.svg", import.meta.url).href,
+  职场: new URL("@/assets/svg/职场.svg", import.meta.url).href,
+  重生: new URL("@/assets/svg/重生.svg", import.meta.url).href,
+  青春: new URL("@/assets/svg/青春.svg", import.meta.url).href,
 };
 
 interface BookState {
@@ -147,7 +169,6 @@ export const useBookStore = defineStore("books", {
           page_size: pageSize,
           sort: category,
         });
-        console.log("Received data:", data);
         return data;
       } catch (error: any) {
         this.error = error.message;
@@ -163,7 +184,6 @@ export const useBookStore = defineStore("books", {
       this.error = null;
       try {
         const result = await bookApi.getLatestBooks(pageSize);
-        console.log("Latest books result:", result);
 
         this.latestBooks = result;
         return {
@@ -185,7 +205,6 @@ export const useBookStore = defineStore("books", {
       this.error = null;
       try {
         const result = await bookApi.getPopularBooks(pageSize);
-        console.log("Popular books result:", result);
 
         this.popularBooks = result;
         return {

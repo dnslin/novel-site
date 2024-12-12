@@ -137,6 +137,20 @@ const pageUrl = computed(() => {
   }
   return ''
 })
+
+// 添加新的响应式变量
+const isImageLoaded = ref(false)
+const statCardHovered = ref<number | null>(null)
+
+// 添加图片加载完成的处理函数
+const handleImageLoad = () => {
+  isImageLoaded.value = true
+}
+
+// 添加统计卡片hover状态处理
+const handleStatCardHover = (index: number | null) => {
+  statCardHovered.value = index
+}
 </script>
 
 <template>
@@ -305,14 +319,18 @@ const pageUrl = computed(() => {
         <!-- 左侧封面和基础信息 -->
         <div class="w-64 flex-shrink-0 space-y-6">
           <!-- 封面 -->
-          <div class="group">
-            <div class="relative overflow-hidden rounded-lg shadow-lg">
-              <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
-                class="w-full transition-transform duration-500 group-hover:scale-110" />
-              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-300 flex items-center justify-center">
-                <BookOpenIcon class="w-12 h-12 text-white transform -translate-y-4 
-                                   group-hover:translate-y-0 transition-all duration-300" />
+          <div class="group relative overflow-hidden rounded-lg shadow-lg">
+            <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" @load="handleImageLoad"
+              class="w-full transition-all duration-500" :class="{
+                'opacity-0': !isImageLoaded,
+                'opacity-100 scale-100 group-hover:scale-110': isImageLoaded
+              }" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent 
+              opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="absolute bottom-4 left-4 right-4 text-white transform translate-y-4 
+                   group-hover:translate-y-0 transition-transform duration-300">
+                <h3 class="text-lg font-bold">{{ book.bookName }}</h3>
+                <p class="text-sm opacity-90">{{ book.author }}</p>
               </div>
             </div>
           </div>
@@ -553,9 +571,12 @@ const pageUrl = computed(() => {
                    focus:border-transparent" placeholder="写下你的评价..."></textarea>
           <div class="flex flex-wrap gap-2">
             <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRateWithAnimation(type.id)"
-              :disabled="ratingLoading"
-              class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary dark:hover:bg-primary-light dark:hover:border-primary-light transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              :class="{
+              :disabled="ratingLoading" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+              text-gray-700 dark:text-gray-300 transition-all duration-300
+              hover:bg-primary hover:text-white hover:border-primary 
+              dark:hover:bg-primary-light dark:hover:border-primary-light 
+              disabled:opacity-50 disabled:cursor-not-allowed
+              transform hover:-translate-y-1 active:translate-y-0" :class="{
                 'animate-[success-pulse_0.5s_ease-in-out]': showRatingSuccess
               }">
               <span class="flex items-center">
@@ -571,6 +592,7 @@ const pageUrl = computed(() => {
 </template>
 
 <style scoped>
+/* 添加新的动画效果 */
 @keyframes success-pulse {
 
   0%,
@@ -585,28 +607,25 @@ const pageUrl = computed(() => {
   }
 }
 
-/* 添加移动端响应式样式 */
-@media (max-width: 640px) {
-  .hero-section {
-    min-height: 300px;
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
   }
 
-  .book-cover {
-    width: 100%;
-    max-width: 240px;
-    margin: 0 auto;
+  50% {
+    transform: translateY(-5px);
   }
 }
 
 .stat-card {
-  @apply flex flex-col items-center p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105;
+  @apply flex flex-col items-center p-4 rounded-lg bg-white dark:bg-gray-800 transition-all duration-300;
 }
 
-.stat-label {
-  @apply text-sm text-gray-500 dark:text-gray-400 mt-1;
+.stat-card:hover {
+  animation: float 3s ease-in-out infinite;
 }
 
-.stat-value {
-  @apply text-lg font-semibold text-gray-900 dark:text-white;
-}
+/* 其他现有样式保持不变 */
 </style>

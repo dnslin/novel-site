@@ -11,7 +11,7 @@
                         <span class="text-xl font-bold text-gray-900 dark:text-white 
                                    hover:text-primary dark:hover:text-primary-light 
                                    transition-colors duration-300">
-                            Novel Share
+                            Reader GO
                         </span>
                     </div>
                     <p class="text-center sm:text-left whitespace-normal sm:whitespace-nowrap">
@@ -123,7 +123,7 @@
                 <p class="text-center text-sm md:text-base text-gray-500 dark:text-gray-400 
                           hover:text-primary dark:hover:text-primary-light
                           transition-colors duration-300 cursor-pointer">
-                    © {{ new Date().getFullYear() }} Novel Share. All rights reserved.
+                    © {{ new Date().getFullYear() }} Reader Go. All rights reserved.
                 </p>
             </div>
         </div>

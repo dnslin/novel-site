@@ -18,7 +18,7 @@ const isDark = computed(() => theme.value === 'dark')
                     <span class="text-xl font-bold text-gray-900 dark:text-white 
                                group-hover:text-primary dark:group-hover:text-primary-light
                                transition-colors duration-300">
-                        Novel Share
+                        Reader Go
                     </span>
                 </router-link>
 

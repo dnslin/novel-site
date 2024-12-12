@@ -37,7 +37,7 @@ import {
                     </h2>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 ml-14">
-                    访问和使用 Novel Share 即表示您同意遵守这些条款。如果您不同意这些条款，
+                    访问和使用 Reader Go 即表示您同意遵守这些条款。如果您不同意这些条款，
                     请勿使用我们的服务。我们保留随时更新这些条款的权利。
                 </p>
             </div>
@@ -113,7 +113,7 @@ import {
             <div class="flex items-center space-x-3 text-yellow-800 dark:text-yellow-200">
                 <ExclamationTriangleIcon class="w-5 h-5 flex-shrink-0" />
                 <p class="text-sm">
-                    本条款最终解释权归 Novel Share 所有。如有疑问，请联系我们的支持团队。
+                    本条款最终解释权归 Reader Go 所有。如有疑问，请联系我们的支持团队。
                 </p>
             </div>
         </div>

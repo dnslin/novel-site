@@ -19,7 +19,7 @@ import {
             </h1>
             <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto
                       animate-fade-in-up animation-delay-200">
-                Novel Share 是一个致力于为读者提供优质阅读体验的开源小说分享平台
+                Reader Go 是一个致力于为读者提供优质阅读体验的开源小说分享平台
             </p>
         </div>
 

@@ -2,11 +2,16 @@
 import { BookOpenIcon, FireIcon, ChevronRightIcon, EyeIcon, ClockIcon } from '@heroicons/vue/24/outline'
 import type { Book } from '@/types'
 import HeicImage from '@/components/common/HeicImage.vue'
+import { getRandomTagColor } from '@/utils/colors'
 
 // 截断文本函数
-const truncateText = (text: string, length: number = 60) => {
+const truncateText = (text: string) => {
     if (!text) return ''
-    return text.length > length ? text.slice(0, length) + '...' : text
+    // 获取当前视窗宽度
+    const width = window.innerWidth
+    // 移动端 (<640px) 显示40个字符，其他情况显示60个字符
+    const maxLength = width < 640 ? 15 : 60
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
 }
 
 // 格式化日期
@@ -27,6 +32,7 @@ const formatDate = (dateStr: string) => {
     // 否则显示具体日期
     return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
 }
+
 
 defineProps<{
     books: Book[]
@@ -131,8 +137,10 @@ defineProps<{
                             <!-- 标签 -->
                             <div class="flex items-center gap-1.5 text-[10px] sm:text-xs flex-wrap">
                                 <template v-if="book.tags && book.tags.length">
-                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-gray-100 text-gray-600 
-                                                 dark:bg-gray-600 dark:text-gray-300">
+                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" :class="[
+                                        'px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full transition-colors duration-300',
+                                        getRandomTagColor(tag.name)
+                                    ]">
                                         {{ tag.name }}
                                     </span>
                                 </template>

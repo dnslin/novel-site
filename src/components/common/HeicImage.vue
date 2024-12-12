@@ -12,7 +12,6 @@ const props = defineProps<{
 
 const toast = useToast()
 const imgSrc = ref<string>(props.placeholder || '/placeholder.jpg')
-const loading = ref(true)
 const error = ref(false)
 
 onMounted(async () => {

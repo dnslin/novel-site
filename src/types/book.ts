@@ -9,7 +9,7 @@ export interface BookQuery extends PaginationQuery {
   type?: string;
 }
 
-// 书籍列表项
+// 基础的书籍信息接口
 export interface Book {
   id: number;
   bookName: string;
@@ -33,14 +33,18 @@ export interface Book {
   hasDownload?: boolean;
 }
 
-// 书籍详情
-export interface BookDetail extends Book {
+// 书籍下载相关信息接口
+export interface BookDownloadInfo {
   file_name: string;
   file_size: number;
   md5: string;
   new_file_name: string;
   parts: string;
   file_url: string;
+}
+
+// 书籍详情接口，继承基础信息并包含下载信息
+export interface BookDetail extends Book, BookDownloadInfo {
   created_at: string;
   hot_value: number;
   intro: string;
@@ -57,13 +61,14 @@ export interface BookUserRating {
   created_at: string;
 }
 
-// 添加新的类型定义
+// BookTag 接口
 export interface BookTag {
   id: number;
   name: string;
   useCount: number;
 }
 
+// BookCategory 接口
 export interface BookCategory {
   id: number;
   name: string;

@@ -11,10 +11,14 @@ import {
   CloudArrowDownIcon,
   HeartIcon,
   UserIcon,
-  TagIcon,
   DocumentTextIcon,
   StarIcon,
   FireIcon,
+  SpeakerWaveIcon,
+  BookmarkIcon,
+  GlobeAltIcon,
+  ChartBarIcon,
+  ClockIcon,
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'
@@ -82,7 +86,7 @@ const handleRate = async (ratingTypeId: number) => {
     commentText.value = '' // 清空评论
     toast.success("评分成功！")
   } catch (error) {
-    toast.error("评分失败，请稍后重试")
+    toast.error("评分失败，请稍后重���")
   }
 }
 
@@ -154,86 +158,134 @@ const pageUrl = computed(() => {
 
     <!-- 书籍详情内容 -->
     <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-      <!-- 移动端封面和标题 -->
+      <!-- 移动端布局 -->
       <div class="md:hidden">
+        <!-- 封面图 -->
         <div class="relative w-full pb-[56.25%]">
           <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
             class="absolute inset-0 w-full h-full object-cover" />
         </div>
+
         <div class="p-4">
+          <!-- 标题和作者 -->
           <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
             {{ book.bookName }}
+            <StarIcon v-if="book.hot_value > 1000" class="inline-block w-5 h-5 text-yellow-400 animate-pulse ml-2" />
           </h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-4">{{ book.author }}</p>
-
-          <!-- 添加移动端标签 -->
-          <div class="flex flex-wrap gap-2 mb-4">
-            <span v-if="book.category" class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
-                         text-primary dark:text-primary-light">
-              {{ book.category.name }}
-            </span>
-            <template v-if="book.tags && book.tags.length">
-              <span v-for="tag in book.tags.slice(0, 2)" :key="tag.id" class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
-                           text-primary dark:text-primary-light">
-                {{ tag.name }}
-              </span>
-            </template>
+          <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
+            <UserIcon class="w-4 h-4" />
+            <span>{{ book.author }}</span>
           </div>
 
-          <!-- 添加移动端统计数据 -->
+          <!-- 分类和标签 -->
+          <div class="space-y-3 mb-4">
+            <!-- 分类 -->
+            <div v-if="book.category || book.subCategory" class="flex flex-wrap gap-2">
+              <span v-if="book.category" class="px-2 py-1 rounded-full text-sm 
+                         bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
+                {{ book.category.name }}
+              </span>
+              <span v-if="book.subCategory" class="px-2 py-1 rounded-full text-sm 
+                         bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
+                {{ book.subCategory.name }}
+              </span>
+            </div>
+
+            <!-- 标签 -->
+            <div v-if="book.tags?.length" class="flex flex-wrap gap-2">
+              <span v-for="tag in book.tags" :key="tag.id" class="px-2 py-1 rounded-full text-sm 
+                       bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                {{ tag.name }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 基础信息 -->
           <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <!-- 热度 -->
+            <div v-if="book.hot_value" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <FireIcon class="w-4 h-4 text-orange-500" />
               <span>热度: {{ book.hot_value }}</span>
             </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <CloudArrowDownIcon class="w-4 h-4 text-blue-500" />
-              <span>下载: {{ book.downloads }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+
+            <!-- 字数 -->
+            <div v-if="book.wordCount" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <DocumentTextIcon class="w-4 h-4 text-green-500" />
-              <span>大小: {{ formatFileSize(book.file_size) }}</span>
+              <span>字数: {{ book.wordCount }}</span>
             </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <CalendarIcon class="w-4 h-4 text-purple-500" />
-              <span>{{ formatDate(book.created_at) }}</span>
+
+            <!-- 阅读次数 -->
+            <div v-if="book.readCount" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <BookOpenIcon class="w-4 h-4 text-blue-500" />
+              <span>阅读: {{ book.readCount }}</span>
+            </div>
+
+            <!-- 听书次数 -->
+            <div v-if="book.listenCount" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <SpeakerWaveIcon class="w-4 h-4 text-purple-500" />
+              <span>听书: {{ book.listenCount }}</span>
+            </div>
+
+            <!-- 来源 -->
+            <div v-if="book.Source" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <GlobeAltIcon class="w-4 h-4 text-indigo-500" />
+              <span>来源: {{ book.Source }}</span>
+            </div>
+
+            <!-- 状态 -->
+            <div v-if="book.bookStatus" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <BookmarkIcon class="w-4 h-4 text-rose-500" />
+              <span>状态: {{ book.bookStatus }}</span>
             </div>
           </div>
 
-          <!-- 添加移动端简介 -->
-          <p class="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
-            {{ book.intro }}
-          </p>
+          <!-- 简介 -->
+          <div v-if="book.description || book.intro" class="mb-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
+              {{ book.description || book.intro }}
+            </p>
+          </div>
 
-          <!-- 添加移动端操作按钮 -->
+          <!-- 操作按钮 -->
           <div class="flex flex-col gap-3">
             <!-- 下载进度条 -->
-            <div v-if="downloading" class="w-full">
+            <div v-if="book.hasDownload && downloading" class="w-full">
               <DownloadProgress :progress="downloadProgress" :downloading="downloading" @retry="downloadBook" />
             </div>
 
-            <!-- 操作按钮 -->
+            <!-- 按钮组 -->
             <div class="grid grid-cols-3 gap-3">
-              <button @click="downloadBook" :disabled="downloading" class="flex items-center justify-center px-4 py-2 
+              <!-- 下载按钮 -->
+              <button v-if="book.hasDownload" @click="downloadBook" :disabled="downloading" class="flex items-center justify-center px-2 py-2 
                        bg-primary hover:bg-primary-dark dark:bg-primary-light 
                        dark:hover:bg-primary text-white rounded-lg 
-                       transition-colors duration-300 text-sm">
+                       transition-colors duration-300 text-sm whitespace-nowrap">
                 <CloudArrowDownIcon class="w-4 h-4" />
                 <span class="ml-1">{{ downloading ? '下载中' : '下载' }}</span>
               </button>
 
-              <button @click="toggleCollect" class="flex items-center justify-center px-4 py-2 
+              <button v-else disabled class="flex items-center justify-center px-2 py-2 
+                       bg-gray-300 dark:bg-gray-600 text-gray-500 
+                       dark:text-gray-400 rounded-lg cursor-not-allowed 
+                       text-sm whitespace-nowrap">
+                <CloudArrowDownIcon class="w-4 h-4" />
+                <span class="ml-1">暂无下载</span>
+              </button>
+
+              <!-- 收藏按钮 -->
+              <button @click="toggleCollect" class="flex items-center justify-center px-2 py-2 
                        border border-gray-300 dark:border-gray-600 
                        text-gray-700 dark:text-gray-300 rounded-lg 
                        hover:bg-gray-50 dark:hover:bg-gray-700/50 
-                       transition-colors duration-300 text-sm">
-                <HeartIcon v-if="!isCollected" class="w-4 h-4" />
-                <HeartSolidIcon v-else class="w-4 h-4 text-red-500" />
+                       transition-colors duration-300 text-sm whitespace-nowrap">
+                <component :is="isCollected ? HeartSolidIcon : HeartIcon" class="w-4 h-4"
+                  :class="{ 'text-red-500': isCollected }" />
                 <span class="ml-1">{{ isCollected ? '已收藏' : '收藏' }}</span>
               </button>
 
-              <ShareBook :title="book.bookName" :author="book.author" :description="book.intro || ''" :url="pageUrl"
-                class="text-sm" />
+              <!-- 分享按钮 -->
+              <ShareBook :title="book.bookName" :author="book.author"
+                :description="book.description || book.intro || ''" :url="pageUrl" class="text-sm" />
             </div>
           </div>
         </div>
@@ -241,156 +293,220 @@ const pageUrl = computed(() => {
 
       <!-- 桌面端布局 -->
       <div class="hidden md:flex gap-8 p-6">
-        <!-- 封面 - 添加悬停效果 -->
-        <div class="w-64 flex-shrink-0 group">
-          <div class="relative overflow-hidden rounded-lg">
-            <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
-              class="w-full transition-transform duration-500 group-hover:scale-110" />
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
-                      transition-opacity duration-300 flex items-center justify-center">
-              <BookOpenIcon class="w-12 h-12 text-white transform -translate-y-4 
-                                 group-hover:translate-y-0 transition-all duration-300" />
-            </div>
-          </div>
-        </div>
-
-        <!-- 主要信息 -->
-        <div class="flex-grow">
-          <div class="flex items-center gap-4 mb-3">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ book.bookName }}</h1>
-            <StarIcon class="w-6 h-6 text-yellow-400 animate-pulse" v-if="book.hot_value > 1000" />
-          </div>
-
-          <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
-            <UserIcon class="w-5 h-5" />
-            <span>{{ book.author }}</span>
-          </div>
-
-          <!-- 标签组 - 添加图标和动画 -->
-          <div class="flex flex-wrap items-center gap-3 mb-6">
-            <span v-if="book.category"
-              class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
-              <TagIcon class="w-4 h-4" />
-              {{ book.category.name }}
-            </span>
-            <template v-if="book.tags && book.tags.length">
-              <span v-for="tag in book.tags.slice(0, 2)" :key="tag.id"
-                class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
-                <DocumentTextIcon class="w-4 h-4" />
-                {{ tag.name }}
-              </span>
-            </template>
-          </div>
-
-          <!-- 统计数据 - 添加动画和图标 -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div
-              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
-              <FireIcon class="w-5 h-5 text-orange-500 mb-1" />
-              <span class="text-sm text-gray-500 dark:text-gray-400">热度</span>
-              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ book.hot_value }}</span>
-            </div>
-            <div
-              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
-              <CloudArrowDownIcon class="w-5 h-5 text-blue-500 mb-1" />
-              <span class="text-sm text-gray-500 dark:text-gray-400">下载次数</span>
-              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ book.downloads }}</span>
-            </div>
-            <div
-              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
-              <DocumentTextIcon class="w-5 h-5 text-green-500 mb-1" />
-              <span class="text-sm text-gray-500 dark:text-gray-400">文件大小</span>
-              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ formatFileSize(book.file_size)
-                }}</span>
-            </div>
-            <div
-              class="flex flex-col items-center p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md transition-all duration-300 hover:scale-105">
-              <CalendarIcon class="w-5 h-5 text-purple-500 mb-1" />
-              <span class="text-sm text-gray-500 dark:text-gray-400">上传时间</span>
-              <span class="text-lg font-semibold text-gray-900 dark:text-white">{{ formatDate(book.created_at) }}</span>
+        <!-- 左侧封面和基础信息 -->
+        <div class="w-64 flex-shrink-0 space-y-6">
+          <!-- 封面 -->
+          <div class="group">
+            <div class="relative overflow-hidden rounded-lg shadow-lg">
+              <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
+                class="w-full transition-transform duration-500 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
+                          transition-opacity duration-300 flex items-center justify-center">
+                <BookOpenIcon class="w-12 h-12 text-white transform -translate-y-4 
+                                   group-hover:translate-y-0 transition-all duration-300" />
+              </div>
             </div>
           </div>
 
-          <!-- 简介 - 添加渐变遮罩 -->
-          <div class="text-gray-700 dark:text-gray-300 mb-6 relative">
-            <span class="line-clamp-3 hover:line-clamp-none transition-all duration-500">
-              {{ book.intro }}
-            </span>
-            <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t 
-                        from-white dark:from-gray-800 to-transparent 
-                        pointer-events-none"></div>
-          </div>
-
-          <!-- 修改操作按钮部分 -->
-          <div class="flex flex-wrap gap-4">
-            <div class="w-full" v-if="downloading">
-              <DownloadProgress :progress="downloadProgress" :downloading="downloading" @retry="downloadBook" />
+          <!-- 基础信息卡片 -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-3 shadow-md">
+            <!-- 书籍状态 -->
+            <div v-if="book.bookStatus" class="flex items-center gap-2">
+              <BookmarkIcon class="w-5 h-5 text-primary" />
+              <span class="text-gray-700 dark:text-gray-300">{{ book.bookStatus }}</span>
             </div>
 
-            <button @click="downloadBook" :disabled="downloading" class="flex-1 md:flex-none flex items-center justify-center px-6 py-2.5 
+            <!-- 来源 -->
+            <div v-if="book.Source" class="flex items-center gap-2">
+              <GlobeAltIcon class="w-5 h-5 text-primary" />
+              <span class="text-gray-700 dark:text-gray-300">{{ book.Source }}</span>
+            </div>
+
+            <!-- 字数 -->
+            <div v-if="book.wordCount" class="flex items-center gap-2">
+              <DocumentTextIcon class="w-5 h-5 text-primary" />
+              <span class="text-gray-700 dark:text-gray-300">{{ book.wordCount }}字</span>
+            </div>
+          </div>
+
+          <!-- 操作按钮组 -->
+          <div class="space-y-3">
+            <!-- 下载按钮根据 hasDownload 显示不同状态 -->
+            <button v-if="book.hasDownload" @click="downloadBook" :disabled="downloading" class="w-full flex items-center justify-center px-4 py-2.5 
                      bg-primary hover:bg-primary-dark dark:bg-primary-light 
-                     dark:hover:bg-primary text-white rounded-lg transition-colors 
-                     duration-300 shadow-sm hover:shadow-md disabled:opacity-80 
-                     disabled:cursor-wait">
+                     dark:hover:bg-primary text-white rounded-lg 
+                     transition-colors duration-300">
               <CloudArrowDownIcon class="w-5 h-5 mr-2" />
               <span>{{ downloading ? '下载中...' : '下载' }}</span>
             </button>
 
-            <button @click="toggleCollect" class="flex-1 md:flex-none flex items-center justify-center px-6 py-2.5 
+            <button v-else disabled class="w-full flex items-center justify-center px-4 py-2.5 
+                     bg-gray-300 dark:bg-gray-600 text-gray-500 
+                     dark:text-gray-400 rounded-lg cursor-not-allowed">
+              <CloudArrowDownIcon class="w-5 h-5 mr-2" />
+              <span>暂无下载</span>
+            </button>
+
+            <button @click="toggleCollect" class="w-full flex items-center justify-center px-4 py-2.5 
                      border border-gray-300 dark:border-gray-600 
                      text-gray-700 dark:text-gray-300 rounded-lg 
                      hover:bg-gray-50 dark:hover:bg-gray-700/50 
                      transition-colors duration-300">
-              <HeartIcon v-if="!isCollected" class="w-5 h-5 mr-2" />
-              <HeartSolidIcon v-else class="w-5 h-5 mr-2 text-red-500" />
+              <component :is="isCollected ? HeartSolidIcon : HeartIcon" class="w-5 h-5 mr-2"
+                :class="{ 'text-red-500': isCollected }" />
               {{ isCollected ? '已收藏' : '收藏' }}
             </button>
 
-            <ShareBook :title="book.bookName" :author="book.author" :description="book.intro || ''" :url="pageUrl" />
+            <ShareBook :title="book.bookName" :author="book.author" :description="book.description || ''" :url="pageUrl"
+              class="w-full" />
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 评分统计部分保持不变，但添加深色模式支持 -->
-    <div v-if="ratingStore.currentBookStats" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评分统计</h2>
-      <div class="space-y-4">
-        <div v-for="type in ratingStore.currentBookStats.rating_types" :key="type.id" class="flex items-center gap-4">
-          <span class="w-20 text-gray-700 dark:text-gray-300">{{ type.name }}</span>
-          <div class="flex-grow bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div class="bg-primary dark:bg-primary-light h-full rounded-full transition-all duration-300"
-              :style="{ width: `${type.percentage}%` }"></div>
+        <!-- 右侧主要内容 -->
+        <div class="flex-grow space-y-6">
+          <!-- 标题和作者 -->
+          <div>
+            <div class="flex items-center gap-4 mb-3">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ book.bookName }}</h1>
+              <StarIcon class="w-6 h-6 text-yellow-400 animate-pulse" v-if="book.hot_value > 1000" />
+            </div>
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <UserIcon class="w-5 h-5" />
+              <span>{{ book.author }}</span>
+            </div>
           </div>
-          <span class="text-sm text-gray-600 dark:text-gray-400">
-            {{ type.count }}人 ({{ type.percentage }}%)
-          </span>
-        </div>
-      </div>
-    </div>
 
-    <!-- 评分表单部分也添加深色模式支持 -->
-    <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评价本书</h2>
-      <div class="space-y-4">
-        <textarea v-model="commentText" rows="3" class="w-full border dark:border-gray-600 rounded-lg p-2 
-                 bg-white dark:bg-gray-700 
-                 text-gray-700 dark:text-gray-200
-                 placeholder:text-gray-400 dark:placeholder:text-gray-500
-                 focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary-light/50
-                 focus:border-transparent" placeholder="写下你的评价..."></textarea>
-        <div class="flex flex-wrap gap-2">
-          <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRateWithAnimation(type.id)"
-            :disabled="ratingLoading"
-            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary dark:hover:bg-primary-light dark:hover:border-primary-light transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            :class="{
-              'animate-[success-pulse_0.5s_ease-in-out]': showRatingSuccess
-            }">
-            <span class="flex items-center">
-              <StarIcon class="w-5 h-5 mr-1" />
-              {{ type.name }}
+          <!-- 分类和标签 -->
+          <div class="space-y-3">
+            <!-- 分类 -->
+            <div v-if="book.category || book.subCategory" class="flex flex-wrap items-center gap-2">
+              <span class="text-gray-500 dark:text-gray-400">分类：</span>
+              <span v-if="book.category" class="px-3 py-1 rounded-full text-sm 
+                         bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
+                {{ book.category.name }}
+              </span>
+              <span v-if="book.subCategory" class="px-3 py-1 rounded-full text-sm 
+                         bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
+                {{ book.subCategory.name }}
+              </span>
+            </div>
+
+            <!-- 标签 -->
+            <div v-if="book.tags?.length" class="flex flex-wrap items-center gap-2">
+              <span class="text-gray-500 dark:text-gray-400">标签：</span>
+              <span v-for="tag in book.tags" :key="tag.id" class="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-700 
+                       text-gray-700 dark:text-gray-300 hover:scale-105 transition-transform">
+                {{ tag.name }}
+                <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">({{ tag.useCount }})</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- 统计数据网格 -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- 热度 -->
+            <div class="stat-card">
+              <FireIcon class="w-5 h-5 text-orange-500" />
+              <span class="stat-label">热度</span>
+              <span class="stat-value">{{ book.hot_value || book.hotValue || 0 }}</span>
+            </div>
+
+            <!-- 其他统计卡片 -->
+            <template v-if="book.downloads">
+              <div class="stat-card">
+                <CloudArrowDownIcon class="w-5 h-5 text-blue-500" />
+                <span class="stat-label">下载</span>
+                <span class="stat-value">{{ book.downloads }}</span>
+              </div>
+            </template>
+
+            <!-- 阅读次数 -->
+            <template v-if="book.readCount">
+              <div class="stat-card">
+                <BookOpenIcon class="w-5 h-5 text-green-500" />
+                <span class="stat-label">阅读</span>
+                <span class="stat-value">{{ book.readCount }}</span>
+              </div>
+            </template>
+
+            <!-- 听书数 -->
+            <template v-if="book.listenCount">
+              <div class="stat-card">
+                <SpeakerWaveIcon class="w-5 h-5 text-purple-500" />
+                <span class="stat-label">听书</span>
+                <span class="stat-value">{{ book.listenCount }}</span>
+              </div>
+            </template>
+          </div>
+
+          <!-- 简介 -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">简介</h2>
+            <div class="relative">
+              <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line 
+                        line-clamp-4 hover:line-clamp-none transition-all duration-300">
+                {{ book.description || book.intro }}
+              </p>
+              <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t 
+                          from-white dark:from-gray-800 to-transparent 
+                          pointer-events-none"></div>
+            </div>
+          </div>
+
+          <!-- 更新信息 -->
+          <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <span v-if="book.lastPublishTime" class="flex items-center gap-1">
+              <CalendarIcon class="w-4 h-4" />
+              最后更新：{{ formatDate(book.lastPublishTime) }}
             </span>
-          </button>
+            <span v-if="book.created_at" class="flex items-center gap-1">
+              <ClockIcon class="w-4 h-4" />
+              创建时间：{{ formatDate(book.created_at) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评分统计部分保持不变，但添加深色模式支持 -->
+      <div v-if="ratingStore.currentBookStats" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评分统计</h2>
+        <div class="space-y-4">
+          <div v-for="type in ratingStore.currentBookStats.rating_types" :key="type.id" class="flex items-center gap-4">
+            <span class="w-20 text-gray-700 dark:text-gray-300">{{ type.name }}</span>
+            <div class="flex-grow bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div class="bg-primary dark:bg-primary-light h-full rounded-full transition-all duration-300"
+                :style="{ width: `${type.percentage}%` }"></div>
+            </div>
+            <span class="text-sm text-gray-600 dark:text-gray-400">
+              {{ type.count }}人 ({{ type.percentage }}%)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评分表单部分也添加深色模式支持 -->
+      <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评价本书</h2>
+        <div class="space-y-4">
+          <textarea v-model="commentText" rows="3" class="w-full border dark:border-gray-600 rounded-lg p-2 
+                   bg-white dark:bg-gray-700 
+                   text-gray-700 dark:text-gray-200
+                   placeholder:text-gray-400 dark:placeholder:text-gray-500
+                   focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary-light/50
+                   focus:border-transparent" placeholder="写下你的评价..."></textarea>
+          <div class="flex flex-wrap gap-2">
+            <button v-for="type in ratingStore.ratingTypes" :key="type.id" @click="handleRateWithAnimation(type.id)"
+              :disabled="ratingLoading"
+              class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary dark:hover:bg-primary-light dark:hover:border-primary-light transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              :class="{
+                'animate-[success-pulse_0.5s_ease-in-out]': showRatingSuccess
+              }">
+              <span class="flex items-center">
+                <StarIcon class="w-5 h-5 mr-1" />
+                {{ type.name }}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -423,5 +539,17 @@ const pageUrl = computed(() => {
     max-width: 240px;
     margin: 0 auto;
   }
+}
+
+.stat-card {
+  @apply flex flex-col items-center p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105;
+}
+
+.stat-label {
+  @apply text-sm text-gray-500 dark:text-gray-400 mt-1;
+}
+
+.stat-value {
+  @apply text-lg font-semibold text-gray-900 dark:text-white;
 }
 </style>

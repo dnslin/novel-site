@@ -57,10 +57,11 @@ defineProps<{
 
         <div class="space-y-4">
             <template v-if="!loading && books.length">
-                <router-link v-for="book in books" :key="book.id" :to="`/books/${book.id}`" class="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg 
+                <router-link v-for="book in books" :key="book.id" :to="`/books/${book.id}`" class="flex bg-gray-50 dark:bg-gray-700/50 rounded overflow-hidden hover:shadow-lg 
                             transition-all duration-300 group">
                     <!-- 封面图片容器 -->
-                    <div class="relative w-24 h-32 flex-shrink-0 overflow-hidden bg-gray-200 dark:bg-gray-600">
+                    <div class="relative w-20 sm:w-24 h-28 sm:h-32 flex-shrink-0 overflow-hidden 
+                              bg-gray-200 dark:bg-gray-600">
                         <!-- 骨架屏 -->
                         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
                                    animate-shimmer" style="background-size: 200% 100%;"></div>
@@ -68,24 +69,25 @@ defineProps<{
                         <!-- 默认占位图标 -->
                         <div v-if="!book.coverUrl"
                             class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                            <BookOpenIcon class="w-12 h-12" />
+                            <BookOpenIcon class="w-8 h-8 sm:w-12 sm:h-12" />
                         </div>
 
                         <!-- 图片 -->
                         <HeicImage v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName"
-                            class="w-24 h-32 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             placeholder="/placeholder.jpg" />
                     </div>
 
                     <!-- 书籍信息 -->
-                    <div class="flex-1 p-4">
-                        <h3 class="font-medium mb-2 group-hover:text-primary dark:text-white 
-                                  transition-colors line-clamp-1">
+                    <div class="flex-1 p-2.5 sm:p-3 flex flex-col min-h-[7rem] sm:min-h-[8rem]">
+                        <h3 class="font-medium mb-1.5 sm:mb-2 group-hover:text-primary dark:text-white 
+                                  transition-colors line-clamp-1 text-base sm:text-lg">
                             {{ book.bookName }}
                         </h3>
 
                         <!-- 作者和基本信息 -->
-                        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
+                                  text-gray-500 dark:text-gray-400 mb-1 sm:mb-1.5">
                             <span>{{ book.author }}</span>
                             <template v-if="book.wordCount">
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
@@ -106,7 +108,8 @@ defineProps<{
                         </div>
 
                         <!-- 分类信息 -->
-                        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
+                                  text-gray-500 dark:text-gray-400 mb-1 sm:mb-1.5">
                             <span v-if="book.category">{{ book.category.name }}</span>
                             <span v-if="book.category && book.subCategory"
                                 class="text-gray-300 dark:text-gray-600">/</span>
@@ -118,16 +121,17 @@ defineProps<{
                         </div>
 
                         <!-- 描述信息 -->
-                        <p v-if="book.description" class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <p v-if="book.description"
+                            class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 sm:mb-1.5 leading-normal">
                             {{ truncateText(book.description) }}
                         </p>
 
                         <!-- 标签和统计信息 -->
-                        <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 mt-auto">
                             <!-- 标签 -->
-                            <div class="flex items-center gap-2 text-xs flex-wrap">
+                            <div class="flex items-center gap-1.5 text-[10px] sm:text-xs flex-wrap">
                                 <template v-if="book.tags && book.tags.length">
-                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 
+                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-gray-100 text-gray-600 
                                                  dark:bg-gray-600 dark:text-gray-300">
                                         {{ tag.name }}
                                     </span>
@@ -135,7 +139,8 @@ defineProps<{
                             </div>
 
                             <!-- 统计信息 -->
-                            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs 
+                                      text-gray-500 dark:text-gray-400">
                                 <div class="flex items-center gap-1" v-if="book.hotValue">
                                     <FireIcon class="w-3 h-3 text-orange-500" />
                                     <span>{{ book.hotValue }}</span>

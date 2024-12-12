@@ -6,7 +6,7 @@ const bookStore = useBookStore()
 <template>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-12 px-2 mt-6">
         <!-- 分类卡片 -->
-        <router-link v-for="category in bookStore.hotCategories" :key="category.name" :to="`/category/${category.name}`"
+        <router-link v-for="category in bookStore.hotCategories" :key="category.id" :to="`/category/${category.id}`"
             class="group relative overflow-hidden rounded-2xl 
              bg-gradient-to-br from-white to-gray-50 
              dark:from-gray-800/80 dark:to-gray-800/40 

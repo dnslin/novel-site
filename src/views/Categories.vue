@@ -84,8 +84,7 @@ onMounted(async () => {
                 </h2>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
-                    <router-link v-for="category in group" :key="category.name" :to="`/category/${category.name}`"
-                        class="group relative overflow-hidden rounded-xl sm:rounded-2xl 
+                    <router-link v-for="category in group" :key="category.id" :to="`/category/${category.id}`" class="group relative overflow-hidden rounded-xl sm:rounded-2xl 
                                bg-gradient-to-br from-white to-gray-50 
                                dark:from-gray-800/80 dark:to-gray-800/40 
                                shadow-sm hover:shadow-xl 

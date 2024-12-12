@@ -168,14 +168,16 @@ const pageUrl = computed(() => {
 
           <!-- 添加移动端标签 -->
           <div class="flex flex-wrap gap-2 mb-4">
-            <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
+            <span v-if="book.category" class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
                          text-primary dark:text-primary-light">
-              {{ book.category }}
+              {{ book.category.name }}
             </span>
-            <span class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
-                         text-primary dark:text-primary-light">
-              {{ book.tag }}
-            </span>
+            <template v-if="book.tags && book.tags.length">
+              <span v-for="tag in book.tags.slice(0, 2)" :key="tag.id" class="px-2 py-1 rounded-full text-sm bg-primary/10 dark:bg-primary/20 
+                           text-primary dark:text-primary-light">
+                {{ tag.name }}
+              </span>
+            </template>
           </div>
 
           <!-- 添加移动端统计数据 -->
@@ -266,16 +268,18 @@ const pageUrl = computed(() => {
 
           <!-- 标签组 - 添加图标和动画 -->
           <div class="flex flex-wrap items-center gap-3 mb-6">
-            <span
+            <span v-if="book.category"
               class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
               <TagIcon class="w-4 h-4" />
-              {{ book.category }}
+              {{ book.category.name }}
             </span>
-            <span
-              class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
-              <DocumentTextIcon class="w-4 h-4" />
-              {{ book.tag }}
-            </span>
+            <template v-if="book.tags && book.tags.length">
+              <span v-for="tag in book.tags.slice(0, 2)" :key="tag.id"
+                class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-all duration-300 hover:scale-105 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
+                <DocumentTextIcon class="w-4 h-4" />
+                {{ tag.name }}
+              </span>
+            </template>
           </div>
 
           <!-- 统计数据 - 添加动画和图标 -->

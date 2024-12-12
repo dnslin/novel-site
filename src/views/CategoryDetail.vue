@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBookStore } from '@/stores/books'
 import BookList from '@/components/home/BookList.vue'
@@ -11,7 +11,14 @@ const route = useRoute()
 const bookStore = useBookStore()
 const toast = useToast()
 
-const categoryName = route.params.name as string
+const categoryId = parseInt(route.params.id as string)
+
+// 获取分类名称
+const categoryName = computed(() => {
+    const category = bookStore.allCategories.find(cat => cat.id === categoryId)
+    return category ? category.name : ''
+})
+
 const books = ref<Book[]>([])
 const loading = ref(true)
 const currentPage = ref(1)
@@ -23,7 +30,7 @@ const loadBooks = async (page: number) => {
     loading.value = true
     try {
         console.log('Loading books for page:', page)
-        const data = await bookStore.getBooksByCategory(categoryName, page, pageSize)
+        const data = await bookStore.getBooksByCategory(categoryId, page, pageSize)
         books.value = data.items
         totalPages.value = Math.ceil(data.total / pageSize)
         console.log('Loaded books:', {
@@ -47,8 +54,12 @@ const handlePageChange = async (page: number) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onMounted(() => {
-    loadBooks(currentPage.value)
+onMounted(async () => {
+    // 确保已经加载了分类列表
+    if (bookStore.allCategories.length === 0) {
+        await bookStore.fetchCategories()
+    }
+    await loadBooks(currentPage.value)
 })
 </script>
 

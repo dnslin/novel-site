@@ -1,7 +1,32 @@
 <script setup lang="ts">
-import { BookOpenIcon, FireIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { BookOpenIcon, FireIcon, ChevronRightIcon, EyeIcon, ClockIcon } from '@heroicons/vue/24/outline'
 import type { Book } from '@/types'
 import HeicImage from '@/components/common/HeicImage.vue'
+
+// 截断文本函数
+const truncateText = (text: string, length: number = 60) => {
+    if (!text) return ''
+    return text.length > length ? text.slice(0, length) + '...' : text
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+
+    // 如果是今天，显示具体时间
+    if (diff < 24 * 60 * 60 * 1000) {
+        return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    }
+    // 如果是最近7天，显示几天前
+    if (diff < 7 * 24 * 60 * 60 * 1000) {
+        const days = Math.floor(diff / (24 * 60 * 60 * 1000))
+        return `${days}天前`
+    }
+    // 否则显示具体日期
+    return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+}
 
 defineProps<{
     books: Book[]
@@ -58,16 +83,72 @@ defineProps<{
                                   transition-colors line-clamp-1">
                             {{ book.bookName }}
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ book.author }}</p>
-                        <div class="mt-2 flex items-center gap-2 text-xs">
-                            <span class="px-2 py-1 rounded-full bg-primary/10 text-primary 
-                                       dark:bg-primary/20 dark:text-primary-light">
-                                {{ book.category }}
-                            </span>
-                            <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 
-                                       dark:bg-gray-600 dark:text-gray-300">
-                                {{ book.tag }}
-                            </span>
+
+                        <!-- 作者和基本信息 -->
+                        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                            <span>{{ book.author }}</span>
+                            <template v-if="book.wordCount">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <span>{{ book.wordCount }}</span>
+                            </template>
+                            <template v-if="book.Source">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <span>{{ book.Source }}</span>
+                            </template>
+                            <template v-if="book.rankCount">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <span>{{ book.rankCount }}</span>
+                            </template>
+                            <template v-if="book.rankType">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <span>{{ book.rankType }}</span>
+                            </template>
+                        </div>
+
+                        <!-- 分类信息 -->
+                        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                            <span v-if="book.category">{{ book.category.name }}</span>
+                            <span v-if="book.category && book.subCategory"
+                                class="text-gray-300 dark:text-gray-600">/</span>
+                            <span v-if="book.subCategory">{{ book.subCategory.name }}</span>
+                            <template v-if="book.bookStatus">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <span>{{ book.bookStatus }}</span>
+                            </template>
+                        </div>
+
+                        <!-- 描述信息 -->
+                        <p v-if="book.description" class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            {{ truncateText(book.description) }}
+                        </p>
+
+                        <!-- 标签和统计信息 -->
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <!-- 标签 -->
+                            <div class="flex items-center gap-2 text-xs flex-wrap">
+                                <template v-if="book.tags && book.tags.length">
+                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" class="px-2 py-1 rounded-full bg-gray-100 text-gray-600 
+                                                 dark:bg-gray-600 dark:text-gray-300">
+                                        {{ tag.name }}
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- 统计信息 -->
+                            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center gap-1" v-if="book.hotValue">
+                                    <FireIcon class="w-3 h-3 text-orange-500" />
+                                    <span>{{ book.hotValue }}</span>
+                                </div>
+                                <div class="flex items-center gap-1" v-if="book.readCount">
+                                    <EyeIcon class="w-3 h-3 text-blue-500" />
+                                    <span>{{ book.readCount }}</span>
+                                </div>
+                                <div class="flex items-center gap-1" v-if="book.lastPublishTime">
+                                    <ClockIcon class="w-3 h-3 text-green-500" />
+                                    <span>{{ formatDate(book.lastPublishTime) }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </router-link>
@@ -133,6 +214,14 @@ defineProps<{
     -webkit-box-orient: vertical;
     -moz-box-orient: vertical;
     box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 添加两行文本截断 */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 </style>

@@ -60,8 +60,12 @@ interface BookState {
   categories: Array<{
     name: string;
     icon: string;
+    id: number;
   }>;
-  allCategories: string[];
+  allCategories: Array<{
+    id: number;
+    name: string;
+  }>;
   loading: boolean;
   error: string | null;
   searchSuggestions: Book[];
@@ -94,10 +98,13 @@ export const useBookStore = defineStore("books", {
         this.allCategories = result;
 
         // 转换为带图标的分类数组
-        this.categories = result.map((sort) => ({
-          name: sort,
-          icon: SORT_ICONS[sort] || SORT_ICONS.default,
-        }));
+        this.categories = result.map(
+          (category: { id: number; name: string }) => ({
+            id: category.id,
+            name: category.name,
+            icon: SORT_ICONS[category.name] || SORT_ICONS.其他,
+          })
+        );
       } catch (error: any) {
         this.error = error.message;
         console.error("获取分类失败:", error);
@@ -152,24 +159,34 @@ export const useBookStore = defineStore("books", {
     },
 
     async getBooksByCategory(
-      category: string,
+      categoryId: number,
       page: number = 1,
       pageSize: number = 12
     ) {
+      if (!categoryId || isNaN(categoryId)) {
+        throw new Error("无效的分类ID");
+      }
+
       this.loading = true;
       this.error = null;
       try {
-        console.log("Fetching category books with params:", {
-          category,
+        const response = await bookApi.getBooksByCategory(categoryId, {
           page,
-          pageSize,
+          size: pageSize,
         });
-        const data = await bookApi.getBooks({
-          page,
-          page_size: pageSize,
-          sort: category,
-        });
-        return data;
+
+        // 检查响应
+        if (!response?.content) {
+          throw new Error("返回数据格式错误");
+        }
+
+        // 适配返回的数据结构
+        return {
+          items: response.content || [],
+          total: response.totalElements || 0,
+          page: response.number || 0,
+          limit: response.size || pageSize,
+        };
       } catch (error: any) {
         this.error = error.message;
         console.error("获取分类书籍失败:", error);

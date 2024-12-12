@@ -16,10 +16,13 @@ export interface Book {
   author: string;
   description?: string;
   coverUrl?: string;
-  tag?: string;
+  tags?: BookTag[];
   hotValue?: number;
-  category?: string;
-  subCategory?: string;
+  category?: BookCategory;
+  subCategory?: BookCategory;
+  bookCount?: number;
+  rankCount?: number;
+  rankType?: string;
   wordCount?: string;
   readCount?: number;
   bookStatus?: string;
@@ -52,4 +55,17 @@ export interface BookUserRating {
   rating_type_id: number;
   comment?: string;
   created_at: string;
+}
+
+// 添加新的类型定义
+export interface BookTag {
+  id: number;
+  name: string;
+  useCount: number;
+}
+
+export interface BookCategory {
+  id: number;
+  name: string;
+  parentId?: number;
 }

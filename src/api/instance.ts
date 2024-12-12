@@ -3,7 +3,7 @@ import type { ApiResponse } from "@/types";
 
 const instance = axios.create({
   baseURL: "/api",
-  timeout: 5000,
+  timeout: 6 * 1000 * 10,
   headers: {
     "Content-Type": "application/json",
   },

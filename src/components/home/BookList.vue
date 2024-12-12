@@ -33,6 +33,23 @@ const formatDate = (dateStr: string) => {
     return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
 }
 
+// 格式化字数
+const formatWordCount = (wordCount: string) => {
+    if (!wordCount) return ''
+
+    // 移除非数字字符，转换为数字
+    const count = parseInt(wordCount.replace(/[^0-9]/g, ''))
+
+    if (isNaN(count)) return wordCount
+
+    if (count >= 10000) {
+        const wan = (count / 10000).toFixed(1)
+        // 如果小数点后为0，则去掉小数点和0
+        return `${wan.endsWith('.0') ? wan.slice(0, -2) : wan}万字`
+    }
+
+    return `${count}字`
+}
 
 defineProps<{
     books: Book[]
@@ -64,14 +81,13 @@ defineProps<{
         <div class="space-y-4">
             <template v-if="!loading && books.length">
                 <router-link v-for="book in books" :key="book.id" :to="`/books/${book.id}`" class="flex bg-gray-50 dark:bg-gray-700/50 rounded overflow-hidden hover:shadow-lg 
-                            transition-all duration-300 group">
-                    <!-- 封面图片容器 -->
-                    <div class="relative w-20 sm:w-24 h-28 sm:h-32 flex-shrink-0 overflow-hidden 
+                           transition-all duration-300 group min-h-[8rem] sm:min-h-[10rem]
+                           relative before:absolute before:inset-0 before:rounded before:p-[1px] 
+                           before:bg-gradient-to-r before:from-transparent before:via-primary-light/50 before:to-transparent 
+                           before:opacity-0 hover:before:opacity-100 before:transition-opacity">
+                    <!-- 左侧封面区域 -->
+                    <div class="relative w-[5.5rem] sm:w-28 flex-shrink-0 self-stretch overflow-hidden 
                               bg-gray-200 dark:bg-gray-600">
-                        <!-- 骨架屏 -->
-                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
-                                   animate-shimmer" style="background-size: 200% 100%;"></div>
-
                         <!-- 默认占位图标 -->
                         <div v-if="!book.coverUrl"
                             class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
@@ -79,87 +95,97 @@ defineProps<{
                         </div>
 
                         <!-- 图片 -->
-                        <HeicImage v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName"
-                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            placeholder="/placeholder.jpg" />
+                        <HeicImage v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName" class="h-full w-full object-cover transition-all duration-500 
+                        group-hover:scale-105 group-hover:brightness-110" />
                     </div>
 
-                    <!-- 书籍信息 -->
-                    <div class="flex-1 p-2.5 sm:p-3 flex flex-col min-h-[7rem] sm:min-h-[8rem]">
-                        <h3 class="font-medium mb-1.5 sm:mb-2 group-hover:text-primary dark:text-white 
-                                  transition-colors line-clamp-1 text-base sm:text-lg">
-                            {{ book.bookName }}
-                        </h3>
+                    <!-- 右侧内容区域 -->
+                    <div class="flex-1 p-3 sm:p-4 flex flex-col">
+                        <!-- 上部分：标题、作者等基本信息 -->
+                        <div class="space-y-2">
+                            <h3 class="font-medium group-hover:text-primary dark:text-white 
+                                      transition-colors line-clamp-1 text-base sm:text-lg">
+                                {{ book.bookName }}
+                            </h3>
 
-                        <!-- 作者和基本信息 -->
-                        <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
-                                  text-gray-500 dark:text-gray-400 mb-1 sm:mb-1.5">
-                            <span>{{ book.author }}</span>
-                            <template v-if="book.wordCount">
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <span>{{ book.wordCount }}</span>
-                            </template>
-                            <template v-if="book.Source">
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <span>{{ book.Source }}</span>
-                            </template>
-                            <template v-if="book.rankCount">
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <span>{{ book.rankCount }}</span>
-                            </template>
-                            <template v-if="book.rankType">
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <span>{{ book.rankType }}</span>
-                            </template>
-                        </div>
-
-                        <!-- 分类信息 -->
-                        <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
-                                  text-gray-500 dark:text-gray-400 mb-1 sm:mb-1.5">
-                            <span v-if="book.category">{{ book.category.name }}</span>
-                            <span v-if="book.category && book.subCategory"
-                                class="text-gray-300 dark:text-gray-600">/</span>
-                            <span v-if="book.subCategory">{{ book.subCategory.name }}</span>
-                            <template v-if="book.bookStatus">
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <span>{{ book.bookStatus }}</span>
-                            </template>
-                        </div>
-
-                        <!-- 描述信息 -->
-                        <p v-if="book.description"
-                            class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 sm:mb-1.5 leading-normal">
-                            {{ truncateText(book.description) }}
-                        </p>
-
-                        <!-- 标签和统计信息 -->
-                        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 mt-auto">
-                            <!-- 标签 -->
-                            <div class="flex items-center gap-1.5 text-[10px] sm:text-xs flex-wrap">
-                                <template v-if="book.tags && book.tags.length">
-                                    <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" :class="[
-                                        'px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full transition-colors duration-300',
-                                        getRandomTagColor(tag.name)
-                                    ]">
-                                        {{ tag.name }}
-                                    </span>
+                            <!-- 作者和基本信息 -->
+                            <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
+                                      text-gray-500 dark:text-gray-400">
+                                <span>{{ book.author }}</span>
+                                <template v-if="book.wordCount">
+                                    <span class="text-gray-300 dark:text-gray-600">|</span>
+                                    <span>{{ formatWordCount(book.wordCount) }}</span>
+                                </template>
+                                <template v-if="book.Source">
+                                    <span class="text-gray-300 dark:text-gray-600">|</span>
+                                    <span>{{ book.Source }}</span>
+                                </template>
+                                <template v-if="book.rankCount">
+                                    <span class="text-gray-300 dark:text-gray-600">|</span>
+                                    <span>{{ book.rankCount }}</span>
+                                </template>
+                                <template v-if="book.rankType">
+                                    <span class="text-gray-300 dark:text-gray-600">|</span>
+                                    <span>{{ book.rankType }}</span>
                                 </template>
                             </div>
 
-                            <!-- 统计信息 -->
-                            <div class="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs 
+                            <!-- 分类信息 -->
+                            <div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm 
                                       text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-1" v-if="book.hotValue">
-                                    <FireIcon class="w-3 h-3 text-orange-500" />
-                                    <span>{{ book.hotValue }}</span>
+                                <span v-if="book.category">{{ book.category.name }}</span>
+                                <span v-if="book.category && book.subCategory"
+                                    class="text-gray-300 dark:text-gray-600">/</span>
+                                <span v-if="book.subCategory">{{ book.subCategory.name }}</span>
+                                <template v-if="book.bookStatus">
+                                    <span class="text-gray-300 dark:text-gray-600">|</span>
+                                    <span>{{ book.bookStatus }}</span>
+                                </template>
+                            </div>
+
+                            <!-- 描述信息 -->
+                            <p v-if="book.description"
+                                class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-normal line-clamp-2">
+                                {{ truncateText(book.description) }}
+                            </p>
+                        </div>
+
+                        <!-- 下部分：标签和统计信息 -->
+                        <div class="mt-auto pt-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <!-- 标签 -->
+                                <div class="flex items-center gap-1.5 text-[10px] sm:text-xs flex-wrap">
+                                    <template v-if="book.tags && book.tags.length">
+                                        <span v-for="tag in book.tags.slice(0, 3)" :key="tag.id" :class="[
+                                            'px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full transition-all duration-300',
+                                            getRandomTagColor(tag.name),
+                                            'hover:scale-105 hover:shadow-sm cursor-pointer'
+                                        ]">
+                                            {{ tag.name }}
+                                        </span>
+                                    </template>
                                 </div>
-                                <div class="flex items-center gap-1" v-if="book.readCount">
-                                    <EyeIcon class="w-3 h-3 text-blue-500" />
-                                    <span>{{ book.readCount }}</span>
-                                </div>
-                                <div class="flex items-center gap-1" v-if="book.lastPublishTime">
-                                    <ClockIcon class="w-3 h-3 text-green-500" />
-                                    <span>{{ formatDate(book.lastPublishTime) }}</span>
+
+                                <!-- 统计信息 -->
+                                <div class="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs 
+                                          text-gray-500 dark:text-gray-400 flex-shrink-0">
+                                    <div class="flex items-center gap-1 group/stat relative" v-if="book.hotValue">
+                                        <FireIcon class="w-3 h-3 text-orange-500" />
+                                        <span>{{ book.hotValue }}</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 
+                                                    bg-gray-800 text-white text-xs rounded opacity-0 
+                                                    group-hover/stat:opacity-100 transition-opacity">
+                                            热度值
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1" v-if="book.readCount">
+                                        <EyeIcon class="w-3 h-3 text-blue-500" />
+                                        <span>{{ book.readCount }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1" v-if="book.lastPublishTime">
+                                        <ClockIcon class="w-3 h-3 text-green-500" />
+                                        <span>{{ formatDate(book.lastPublishTime) }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -170,9 +196,9 @@ defineProps<{
             <!-- 加载占位符 -->
             <template v-else>
                 <div v-for="i in 3" :key="i"
-                    class="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl overflow-hidden animate-pulse">
+                    class="flex bg-gray-50 dark:bg-gray-700/50 rounded-xl overflow-hidden animate-pulse min-h-[8rem] sm:min-h-[10rem]">
                     <!-- 封面占位符 -->
-                    <div class="w-24 h-32 bg-gray-200 dark:bg-gray-600"></div>
+                    <div class="w-[5.5rem] sm:w-28 bg-gray-200 dark:bg-gray-600"></div>
                     <!-- 内容占位符 -->
                     <div class="flex-1 p-4">
                         <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
@@ -220,17 +246,11 @@ defineProps<{
 /* 文本截断 */
 .line-clamp-1 {
     display: -webkit-box;
-    display: flex;
     -webkit-line-clamp: 1;
-    -moz-line-clamp: 1;
-    line-clamp: 1;
     -webkit-box-orient: vertical;
-    -moz-box-orient: vertical;
-    box-orient: vertical;
     overflow: hidden;
 }
 
-/* 添加两行文本截断 */
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

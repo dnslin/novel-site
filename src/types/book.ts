@@ -35,17 +35,18 @@ export interface Book {
 
 // 书籍下载相关信息接口
 export interface BookDownloadInfo {
-  file_name: string;
-  file_size: number;
+  fileName: string;
+  fileSize: number;
   md5: string;
-  new_file_name: string;
+  newFileName: string;
   parts: string;
-  file_url: string;
+  fileUrl: string;
 }
 
 // 书籍详情接口，继承基础信息并包含下载信息
 export interface BookDetail extends Book, BookDownloadInfo {
   created_at: string;
+  subInfo: string;
   hot_value: number;
   intro: string;
   downloads: number;

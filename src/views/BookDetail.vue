@@ -19,6 +19,15 @@ import {
   GlobeAltIcon,
   ChartBarIcon,
   ClockIcon,
+  BookmarkSquareIcon,
+  ChatBubbleLeftIcon,
+  ShareIcon,
+  EyeIcon,
+  HandThumbUpIcon,
+  LanguageIcon,
+  RectangleStackIcon,
+  TagIcon,
+  FolderIcon,
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'
@@ -61,7 +70,7 @@ const handleRateWithAnimation = async (ratingTypeId: number) => {
 
 // 获取数据
 onMounted(async () => {
-  // 滚动到顶部
+  // 滚动到顶��
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   try {
@@ -86,7 +95,7 @@ const handleRate = async (ratingTypeId: number) => {
     commentText.value = '' // 清空评论
     toast.success("评分成功！")
   } catch (error) {
-    toast.error("评分失败，请稍后重���")
+    toast.error("评分失败，请稍后重")
   }
 }
 
@@ -109,12 +118,12 @@ const formatDate = (dateStr: string): string => {
 }
 // 文件下载函数
 const downloadBook = async () => {
-  if (!book.value?.file_url) return
+  if (!book.value?.fileUrl) return
 
   await download({
-    url: book.value.file_url,
-    fileName: book.value.file_name || 'download.txt',
-    fileSize: book.value.file_size,
+    url: book.value.fileUrl,
+    fileName: book.value.fileName || 'download.txt',
+    fileSize: book.value.fileSize,
     onProgress: (progress) => {
       console.log(`Download progress: ${progress}%`)
     }
@@ -380,7 +389,10 @@ const pageUrl = computed(() => {
           <div class="space-y-3">
             <!-- 分类 -->
             <div v-if="book.category || book.subCategory" class="flex flex-wrap items-center gap-2">
-              <span class="text-gray-500 dark:text-gray-400">分类：</span>
+              <div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                <FolderIcon class="w-4 h-4" />
+                <span>分类：</span>
+              </div>
               <span v-if="book.category" class="px-3 py-1 rounded-full text-sm 
                          bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                 {{ book.category.name }}
@@ -393,7 +405,10 @@ const pageUrl = computed(() => {
 
             <!-- 标签 -->
             <div v-if="book.tags?.length" class="flex flex-wrap items-center gap-2">
-              <span class="text-gray-500 dark:text-gray-400">标签：</span>
+              <div class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                <TagIcon class="w-4 h-4" />
+                <span>标签：</span>
+              </div>
               <span v-for="tag in book.tags" :key="tag.id" class="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-700 
                        text-gray-700 dark:text-gray-300 hover:scale-105 transition-transform">
                 {{ tag.name }}
@@ -437,11 +452,47 @@ const pageUrl = computed(() => {
                 <span class="stat-value">{{ book.listenCount }}</span>
               </div>
             </template>
+
+            <!-- 榜单 -->
+            <template v-if="book.rankType">
+              <div class="stat-card">
+                <RectangleStackIcon class="w-5 h-5 text-indigo-500" />
+                <span class="stat-label">榜单</span>
+                <span class="stat-value">{{ book.rankType }}</span>
+              </div>
+            </template>
+            <!-- 月票 -->
+            <template v-if="book.rankCount">
+              <div class="stat-card">
+                <RectangleStackIcon class="w-5 h-5 text-indigo-500" />
+                <span class="stat-label">月票</span>
+                <span class="stat-value">{{ book.rankCount }}</span>
+              </div>
+            </template>
+            <!-- 文件大小 -->
+            <template v-if="book.fileSize">
+              <div class="stat-card">
+                <RectangleStackIcon class="w-5 h-5 text-indigo-500" />
+                <span class="stat-label">文件大小</span>
+                <span class="stat-value">{{ formatFileSize(book.fileSize) }}</span>
+              </div>
+            </template>
+            <!-- 追读人数 -->
+            <template v-if="book.subInfo">
+              <div class="stat-card">
+                <RectangleStackIcon class="w-5 h-5 text-indigo-500" />
+                <span class="stat-label">追读人数</span>
+                <span class="stat-value">{{ book.subInfo }}</span>
+              </div>
+            </template>
           </div>
 
           <!-- 简介 -->
           <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">简介</h2>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <BookmarkSquareIcon class="w-6 h-6 text-primary" />
+              <span>简介</span>
+            </h2>
             <div class="relative">
               <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line 
                         line-clamp-4 hover:line-clamp-none transition-all duration-300">
@@ -469,7 +520,10 @@ const pageUrl = computed(() => {
 
       <!-- 评分统计部分保持不变，但添加深色模式支持 -->
       <div v-if="ratingStore.currentBookStats" class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评分统计</h2>
+        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          <HandThumbUpIcon class="w-6 h-6 text-primary" />
+          <span>评分统计</span>
+        </h2>
         <div class="space-y-4">
           <div v-for="type in ratingStore.currentBookStats.rating_types" :key="type.id" class="flex items-center gap-4">
             <span class="w-20 text-gray-700 dark:text-gray-300">{{ type.name }}</span>
@@ -486,7 +540,10 @@ const pageUrl = computed(() => {
 
       <!-- 评分表单部分也添加深色模式支持 -->
       <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">评价本书</h2>
+        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          <ChatBubbleLeftIcon class="w-6 h-6 text-primary" />
+          <span>评价本书</span>
+        </h2>
         <div class="space-y-4">
           <textarea v-model="commentText" rows="3" class="w-full border dark:border-gray-600 rounded-lg p-2 
                    bg-white dark:bg-gray-700 

@@ -26,15 +26,42 @@ const groupedCategories = computed(() => {
     }
 
     filteredCategories.value.forEach(category => {
-        if (category.name.includes('言情') || category.name.includes('青春')) {
+        // 女生向分类
+        if (category.name.includes('言情') ||
+            category.name.includes('青春') ||
+            category.name.includes('穿越') ||
+            category.name.includes('种田') ||
+            category.name.includes('空间') ||
+            category.name.includes('重生')) {
             groups['女生'].push(category)
-        } else if (category.name.includes('玄幻') || category.name.includes('武侠') ||
-            category.name.includes('都市') || category.name.includes('仙侠')) {
+        }
+        // 男生向分类
+        else if (category.name.includes('玄幻') ||
+            category.name.includes('武侠') ||
+            category.name.includes('都市') ||
+            category.name.includes('仙侠') ||
+            category.name.includes('奇幻') ||
+            category.name.includes('修真') ||
+            category.name.includes('游戏竞技') ||
+            category.name.includes('军事') ||
+            category.name.includes('末世') ||
+            category.name.includes('电竞') ||
+            category.name.includes('系统') ||
+            category.name.includes('无限')) {
             groups['男生'].push(category)
-        } else if (category.name.includes('文学') || category.name.includes('传记') ||
-            category.name.includes('现实')) {
+        }
+        // 出版物分类
+        else if (category.name.includes('文学') ||
+            category.name.includes('传记') ||
+            category.name.includes('现实') ||
+            category.name.includes('职场') ||
+            category.name.includes('历史') ||
+            category.name.includes('科幻') ||
+            category.name.includes('悬疑')) {
             groups['出版'].push(category)
-        } else {
+        }
+        // 其他分类
+        else {
             groups['其他'].push(category)
         }
     })

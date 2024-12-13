@@ -11,7 +11,7 @@
                         <span class="text-xl font-bold text-gray-900 dark:text-white 
                                    hover:text-primary dark:hover:text-primary-light 
                                    transition-colors duration-300">
-                            Reader GO
+                            Reader Go
                         </span>
                     </div>
                     <p class="text-center sm:text-left whitespace-normal sm:whitespace-nowrap">

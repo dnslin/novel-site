@@ -17,14 +17,10 @@ import {
   SpeakerWaveIcon,
   BookmarkIcon,
   GlobeAltIcon,
-  ChartBarIcon,
   ClockIcon,
   BookmarkSquareIcon,
   ChatBubbleLeftIcon,
-  ShareIcon,
-  EyeIcon,
   HandThumbUpIcon,
-  LanguageIcon,
   RectangleStackIcon,
   TagIcon,
   FolderIcon,
@@ -34,6 +30,7 @@ import { useToast } from 'vue-toastification'
 import DownloadProgress from '@/components/book/DownloadProgress.vue'
 import ShareBook from '@/components/book/ShareBook.vue'
 import { useFileDownload } from '@/utils/download'
+import HeicImage from '@/components/common/HeicImage.vue'
 
 const route = useRoute()
 const bookStore = useBookStore()
@@ -70,7 +67,7 @@ const handleRateWithAnimation = async (ratingTypeId: number) => {
 
 // 获取数据
 onMounted(async () => {
-  // 滚动到顶��
+  // 滚动到顶
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   try {
@@ -142,7 +139,7 @@ const pageUrl = computed(() => {
 const isImageLoaded = ref(false)
 const statCardHovered = ref<number | null>(null)
 
-// 添加图片加载完成的处理函数
+// 添加图片加载完成的处理函数 
 const handleImageLoad = () => {
   isImageLoaded.value = true
 }
@@ -184,9 +181,11 @@ const handleStatCardHover = (index: number | null) => {
       <!-- 移动端布局 -->
       <div class="md:hidden">
         <!-- 封面图 -->
-        <div class="relative w-full pb-[56.25%]">
-          <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName"
-            class="absolute inset-0 w-full h-full object-cover" />
+        <div class="relative w-full" style="padding-bottom: 56.25%;">
+          <div class="absolute inset-0">
+            <HeicImage :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" @load="handleImageLoad"
+              class="transition-all duration-500 group-hover:scale-110" />
+          </div>
         </div>
 
         <div class="p-4">
@@ -319,12 +318,11 @@ const handleStatCardHover = (index: number | null) => {
         <!-- 左侧封面和基础信息 -->
         <div class="w-64 flex-shrink-0 space-y-6">
           <!-- 封面 -->
-          <div class="group relative overflow-hidden rounded-lg shadow-lg">
-            <img :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" @load="handleImageLoad"
-              class="w-full transition-all duration-500" :class="{
-                'opacity-0': !isImageLoaded,
-                'opacity-100 scale-100 group-hover:scale-110': isImageLoaded
-              }" />
+          <div class="group relative overflow-hidden rounded-lg shadow-lg" style="padding-bottom: 150%">
+            <div class="absolute inset-0">
+              <HeicImage :src="book.coverUrl || '/placeholder.jpg'" :alt="book.bookName" @load="handleImageLoad"
+                class="transition-all duration-500 group-hover:scale-110" />
+            </div>
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent 
               opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div class="absolute bottom-4 left-4 right-4 text-white transform translate-y-4 
@@ -403,7 +401,7 @@ const handleStatCardHover = (index: number | null) => {
             </div>
           </div>
 
-          <!-- 分类和标签 -->
+          <!-- 分类标签 -->
           <div class="space-y-3">
             <!-- 分类 -->
             <div v-if="book.category || book.subCategory" class="flex flex-wrap items-center gap-2">

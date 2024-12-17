@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import Toast from "vue-toastification";
 // Import the CSS
 import "vue-toastification/dist/index.css";
@@ -11,6 +12,7 @@ import "./styles/global.css";
 
 const app = createApp(App);
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 // Toast Configuration
 const toastOptions = {

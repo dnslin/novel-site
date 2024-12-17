@@ -9,13 +9,25 @@ const instance = axios.create({
   },
 });
 
+// 请求拦截器
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.token = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // 响应拦截器
 instance.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse;
     if (res.code !== 200) {
-      // 统一错误处理
-      console.error(res.message || "请求失败");
       return Promise.reject(new Error(res.message || "请求失败"));
     }
     return res.result;

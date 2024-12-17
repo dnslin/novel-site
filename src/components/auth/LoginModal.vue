@@ -6,15 +6,15 @@ import { useAuth } from '@/composables/useAuth'
 const emit = defineEmits(['close'])
 
 const form = ref({
-    email: '',
+    username: '',
     password: ''
 })
 
-const { isLoading, emailError, validateEmail, login } = useAuth()
+const { isLoading, usernameError, validateUsername, login } = useAuth()
 
 // 添加表单验证
 const errors = ref({
-    email: '',
+    username: '',
     password: ''
 })
 
@@ -77,20 +77,21 @@ onUnmounted(() => {
 
                 <form @submit.prevent="handleSubmit" class="space-y-4">
                     <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">邮箱</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
                         <div class="relative">
                             <EnvelopeIcon
                                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="email" v-model="form.email" @blur="() => validateEmail(form.email)"
-                                :class="{ 'border-red-500 focus:ring-red-500': emailError }" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                            <input type="text" v-model="form.username" @blur="() => validateUsername(form.username)"
+                                autocomplete="username" :class="{ 'border-red-500 focus:ring-red-500': usernameError }"
+                                required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
                                        text-gray-900 dark:text-white
                                        bg-white dark:bg-gray-700
                                        focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
                                        focus:border-transparent
                                        transition-all duration-200">
                         </div>
-                        <p v-if="emailError" class="mt-1 text-sm text-red-500 animate-shake">{{ emailError }}</p>
+                        <p v-if="usernameError" class="mt-1 text-sm text-red-500 animate-shake">{{ usernameError }}</p>
                     </div>
 
                     <div class="relative group">

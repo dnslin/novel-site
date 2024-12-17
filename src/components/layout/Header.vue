@@ -2,21 +2,23 @@
 import { MoonIcon, SunIcon } from '@heroicons/vue/24/outline'
 import { useTheme } from '@/composables/useTheme'
 import { computed, ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 import LoginModal from '@/components/auth/LoginModal.vue'
 import RegisterModal from '@/components/auth/RegisterModal.vue'
+import UserAvatar from '@/components/user/UserAvatar.vue'
 
 const { theme, toggleTheme } = useTheme()
 const isDark = computed(() => theme.value === 'dark')
 
+// 使用 userStore
+const userStore = useUserStore()
+const { currentUser, loading } = storeToRefs(userStore)
+const isLoggedIn = computed(() => !!currentUser.value)
+
 // 添加登录状态控制
-const isLoggedIn = ref(false)
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
-const showUserMenu = ref(false)
-
-// 用户信息（临时）
-const userAvatar = ref('/default-avatar.png')
-const userName = ref('用户名')
 
 // 处理登录/注册模态框
 const openLoginModal = () => {
@@ -26,12 +28,6 @@ const openLoginModal = () => {
 const openRegisterModal = () => {
     showRegisterModal.value = true
 }
-
-// 用户菜单控制
-const toggleUserMenu = () => {
-    showUserMenu.value = !showUserMenu.value
-}
-
 </script>
 
 <template>
@@ -67,8 +63,11 @@ const toggleUserMenu = () => {
 
                 <!-- 右侧工具栏 - 重新设计按钮样式 -->
                 <div class="flex items-center space-x-4">
+                    <!-- 加载状态 -->
+                    <div v-if="loading" class="w-20 h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md"></div>
+
                     <!-- 未登录状态显示登录/注册按钮 -->
-                    <template v-if="!isLoggedIn">
+                    <template v-if="!loading && !isLoggedIn">
                         <button @click="openLoginModal" class="px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 
                                    hover:text-[#8ffcfc] dark:hover:text-[#8ffcfc]
                                    border border-gray-300 dark:border-gray-600 rounded-md
@@ -87,28 +86,7 @@ const toggleUserMenu = () => {
                     </template>
 
                     <!-- 已登录状态显示用户头像和下拉菜单 -->
-                    <div v-else class="relative">
-                        <button @click="toggleUserMenu" class="flex items-center space-x-2 p-1.5 rounded-full
-                                   hover:bg-gray-100 dark:hover:bg-gray-800
-                                   transition-colors duration-300">
-                            <img :src="userAvatar" alt="用户头像"
-                                class="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                {{ userName }}
-                            </span>
-                        </button>
-
-                        <!-- 用户菜单 -->
-                        <div v-if="showUserMenu" class="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 
-                                   rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
-                                              hover:bg-gray-100 dark:hover:bg-gray-700">个人中心</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
-                                              hover:bg-gray-100 dark:hover:bg-gray-700">设置</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 
-                                              hover:bg-gray-100 dark:hover:bg-gray-700">退出登录</a>
-                        </div>
-                    </div>
+                    <UserAvatar v-if="!loading && isLoggedIn" />
 
                     <!-- 主题切换按钮 -->
                     <button @click="toggleTheme" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 

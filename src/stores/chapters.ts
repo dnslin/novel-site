@@ -6,6 +6,7 @@ interface ChapterState {
   chapters: Chapter[];
   loading: boolean;
   error: string | null;
+  syncing: boolean;
 }
 
 export const useChapterStore = defineStore("chapters", {
@@ -13,6 +14,7 @@ export const useChapterStore = defineStore("chapters", {
     chapters: [],
     loading: false,
     error: null,
+    syncing: false,
   }),
 
   getters: {
@@ -57,6 +59,22 @@ export const useChapterStore = defineStore("chapters", {
         console.error("获取章节列表失败:", error);
       } finally {
         this.loading = false;
+      }
+    },
+
+    async syncChapters(bookId: number) {
+      this.syncing = true;
+      this.error = null;
+      try {
+        await chapterApi.syncBookChapters(bookId);
+        await this.fetchBookChapters(bookId);
+        return { success: true, message: "章节同步成功" };
+      } catch (error: any) {
+        const errorMessage = error.message || "同步失败";
+        this.error = errorMessage;
+        return { success: false, message: errorMessage };
+      } finally {
+        this.syncing = false;
       }
     },
   },

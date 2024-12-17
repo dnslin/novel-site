@@ -24,6 +24,7 @@ import {
   RectangleStackIcon,
   TagIcon,
   FolderIcon,
+  ArrowPathIcon,
 } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'
@@ -32,11 +33,14 @@ import ShareBook from '@/components/book/ShareBook.vue'
 import { useFileDownload } from '@/utils/download'
 import HeicImage from '@/components/common/HeicImage.vue'
 import ChapterList from '@/components/book/ChapterList.vue'
+import { useChapterStore } from '@/stores/chapters'
 
 const route = useRoute()
 const bookStore = useBookStore()
 const ratingStore = useRatingStore()
 const toast = useToast()
+const chapterStore = useChapterStore()
+const { syncing } = storeToRefs(chapterStore)
 
 const bookId = Number(route.params.id)
 const book = ref<BookDetail | null>(null)
@@ -140,14 +144,23 @@ const pageUrl = computed(() => {
 const isImageLoaded = ref(false)
 const statCardHovered = ref<number | null>(null)
 
-// 添加图���加载完成的处理函数 
+// 添加图片加载完成的处理函数 
 const handleImageLoad = () => {
   isImageLoaded.value = true
 }
 
-// 添加统计卡片hover状态处理
-const handleStatCardHover = (index: number | null) => {
-  statCardHovered.value = index
+
+
+// 添加同步方法
+const handleSync = async () => {
+  if (syncing.value || !book.value) return;
+
+  try {
+    const result = await chapterStore.syncChapters(book.value.id);
+    toast[result.success ? 'success' : 'error'](result.message);
+  } catch (error: any) {
+    toast.error("同步失败");
+  }
 }
 </script>
 
@@ -270,9 +283,24 @@ const handleStatCardHover = (index: number | null) => {
           </div>
 
           <!-- 章节列表 -->
-          <div class="mb-4">
-            <ChapterList :book-id="bookId" />
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <BookmarkSquareIcon class="w-6 h-6 text-primary" />
+              <span>章节列表</span>
+            </h2>
+            <button @click="handleSync" :disabled="syncing" class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg
+                     text-gray-700 dark:text-gray-300
+                     border border-gray-300 dark:border-gray-600
+                     hover:bg-gray-100 dark:hover:bg-gray-700
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-all duration-300">
+              <ArrowPathIcon class="w-4 h-4" :class="{ 'animate-spin': syncing }" />
+              {{ syncing ? '同步中...' : '同步章节' }}
+            </button>
           </div>
+
+          <!-- 章节列表组件 -->
+          <ChapterList :book-id="bookId" />
 
           <!-- 评分统计 -->
           <div v-if="ratingStore.currentBookStats" class="mb-4 bg-white dark:bg-gray-800 rounded-lg p-4">
@@ -594,6 +622,21 @@ const handleStatCardHover = (index: number | null) => {
 
             <!-- 章节列表 -->
             <div class="mt-8">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <BookmarkSquareIcon class="w-6 h-6 text-primary" />
+                  <span>章节列表</span>
+                </h2>
+                <button @click="handleSync" :disabled="syncing" class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg
+                         text-gray-700 dark:text-gray-300
+                         border border-gray-300 dark:border-gray-600
+                         hover:bg-gray-100 dark:hover:bg-gray-700
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         transition-all duration-300">
+                  <ArrowPathIcon class="w-4 h-4" :class="{ 'animate-spin': syncing }" />
+                  {{ syncing ? '同步中...' : '同步章节' }}
+                </button>
+              </div>
               <ChapterList :book-id="bookId" />
             </div>
           </div>
@@ -776,5 +819,20 @@ const handleStatCardHover = (index: number | null) => {
 
 .rating-btn:hover::before {
   transform: translateX(100%);
+}
+
+/* 添加同步按钮动画 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style>

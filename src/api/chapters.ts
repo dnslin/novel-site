@@ -6,4 +6,9 @@ export const chapterApi = {
   getBookChapters(bookId: number) {
     return instance.get<never, Chapter[]>(`/chapters/books/${bookId}`);
   },
+
+  // 同步书籍章节
+  syncBookChapters(bookId: number) {
+    return instance.post<never, void>(`/chapters/chapters/sync/${bookId}`);
+  },
 };

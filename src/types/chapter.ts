@@ -1,7 +1,7 @@
 // 章节相关类型定义
 export interface Chapter {
   uuid: number;
-  chapterName: string;
+  title: string;
   volumeName: string;
   wordCount: number;
   chapterUrl: string;

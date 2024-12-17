@@ -32,9 +32,6 @@ const toggleUserMenu = () => {
     showUserMenu.value = !showUserMenu.value
 }
 
-const closeUserMenu = () => {
-    showUserMenu.value = false
-}
 </script>
 
 <template>

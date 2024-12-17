@@ -6,7 +6,6 @@ import {
     ChevronUpIcon,
     BookOpenIcon,
     LockClosedIcon,
-    ArrowPathIcon
 } from '@heroicons/vue/24/outline'
 
 const props = defineProps<{
@@ -38,11 +37,6 @@ const formatWordCount = (count: number): string => {
     return `${count}字`
 }
 
-// 添加同步方法（暂时为空）
-const handleSync = () => {
-    // TODO: 实现同步逻辑
-}
-
 // 初始加载
 loadChapters()
 </script>
@@ -72,13 +66,6 @@ loadChapters()
                     <span>共 {{ chapterStore.totalChapters }} 章</span>
                     <span>总计 {{ formatWordCount(chapterStore.totalWordCount) }}</span>
                 </div>
-                <button @click="handleSync" class="flex items-center gap-1 px-2 py-1 rounded-md
-                               hover:bg-gray-100 dark:hover:bg-gray-700
-                               text-primary dark:text-primary-light
-                               transition-colors duration-300">
-                    <ArrowPathIcon class="w-4 h-4" />
-                    <span>同步</span>
-                </button>
             </div>
 
             <!-- 卷列表 -->
@@ -100,7 +87,7 @@ loadChapters()
                         <div class="flex items-center gap-2">
                             <BookOpenIcon class="w-4 h-4 text-gray-400" />
                             <span class="text-gray-900 dark:text-white line-clamp-1">
-                                {{ chapter.chapterName }}
+                                {{ chapter.title }}
                             </span>
                             <LockClosedIcon v-if="chapter.isVip" class="w-4 h-4 text-yellow-500" />
                         </div>

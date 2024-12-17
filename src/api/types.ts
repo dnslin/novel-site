@@ -1,8 +1,8 @@
 // 通用响应类型
-export interface ApiResponse<T = any> {
+export interface ApiResponse {
   code: number;
-  message?: string;
-  result: T;
+  message: string;
+  result?: any;
 }
 
 // 分页请求参数

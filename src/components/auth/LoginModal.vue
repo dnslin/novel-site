@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { XMarkIcon, EnvelopeIcon, LockClosedIcon, ArrowRightIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+import { useAuth } from '@/composables/useAuth'
 
 const emit = defineEmits(['close'])
 
@@ -9,24 +10,13 @@ const form = ref({
     password: ''
 })
 
-const isLoading = ref(false)
+const { isLoading, emailError, validateEmail, login } = useAuth()
 
 // 添加表单验证
 const errors = ref({
     email: '',
     password: ''
 })
-
-const validateEmail = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!form.value.email) {
-        errors.value.email = '请输入邮箱'
-    } else if (!emailRegex.test(form.value.email)) {
-        errors.value.email = '请输入有效的邮箱地址'
-    } else {
-        errors.value.email = ''
-    }
-}
 
 const validatePassword = () => {
     if (!form.value.password) {
@@ -38,27 +28,10 @@ const validatePassword = () => {
     }
 }
 
-const isFormValid = computed(() => {
-    return !errors.value.email && !errors.value.password && form.value.email && form.value.password
-})
-
 const handleSubmit = async () => {
-    validateEmail()
     validatePassword()
-
-    if (!isFormValid.value) return
-
-    if (isLoading.value) return
-
-    isLoading.value = true
-    try {
-        // 调用登录 API
-        // await login(form.value)
+    if (await login(form.value)) {
         emit('close')
-    } catch (error) {
-        // 处理错误
-    } finally {
-        isLoading.value = false
     }
 }
 
@@ -109,15 +82,15 @@ onUnmounted(() => {
                             <EnvelopeIcon
                                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="email" v-model="form.email" @blur="validateEmail"
-                                :class="{ 'border-red-500 focus:ring-red-500': errors.email }" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                            <input type="email" v-model="form.email" @blur="() => validateEmail(form.email)"
+                                :class="{ 'border-red-500 focus:ring-red-500': emailError }" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
                                        text-gray-900 dark:text-white
                                        bg-white dark:bg-gray-700
                                        focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
                                        focus:border-transparent
                                        transition-all duration-200">
                         </div>
-                        <p v-if="errors.email" class="mt-1 text-sm text-red-500 animate-shake">{{ errors.email }}</p>
+                        <p v-if="emailError" class="mt-1 text-sm text-red-500 animate-shake">{{ emailError }}</p>
                     </div>
 
                     <div class="relative group">

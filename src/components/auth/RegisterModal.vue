@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { XMarkIcon, UserIcon, EnvelopeIcon, LockClosedIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
+import { useAuth } from '@/composables/useAuth'
 
 const emit = defineEmits(['close'])
 
@@ -11,20 +12,11 @@ const form = ref({
     confirmPassword: ''
 })
 
-const isLoading = ref(false)
+const { isLoading, emailError, validateEmail, register } = useAuth()
 
 const handleSubmit = async () => {
-    if (isLoading.value) return
-
-    isLoading.value = true
-    try {
-        // 调用注册 API
-        // await register(form.value)
+    if (await register(form.value)) {
         emit('close')
-    } catch (error) {
-        // 处理错误
-    } finally {
-        isLoading.value = false
     }
 }
 </script>
@@ -68,13 +60,16 @@ const handleSubmit = async () => {
                             <EnvelopeIcon
                                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="email" v-model="form.email" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
+                            <input type="email" v-model="form.email" @blur="() => validateEmail(form.email)" required
+                                class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          text-gray-900 dark:text-white
+                                          bg-white dark:bg-gray-700
+                                          focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                          focus:border-transparent
+                                          transition-all duration-200"
+                                :class="{ 'border-red-500 focus:ring-red-500': emailError }">
                         </div>
+                        <p v-if="emailError" class="mt-1 text-sm text-red-500">{{ emailError }}</p>
                     </div>
 
                     <div class="relative group">

@@ -100,7 +100,8 @@ onUnmounted(() => {
                             <LockClosedIcon
                                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                            text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                            <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
+                                autocomplete="current-password" class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
                                        text-gray-900 dark:text-white
                                        bg-white dark:bg-gray-700
                                        focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]

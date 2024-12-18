@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { XMarkIcon, UserIcon, EnvelopeIcon, LockClosedIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon, UserIcon, EnvelopeIcon, LockClosedIcon, ShieldCheckIcon, IdentificationIcon } from '@heroicons/vue/24/outline'
 import { useAuth } from '@/composables/useAuth'
 
 const emit = defineEmits(['close'])
@@ -9,10 +9,12 @@ const form = ref({
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    nickname: '',
+    introduction: '',
 })
 
-const { isLoading, emailError, validateEmail, register } = useAuth()
+const { isLoading, emailError, usernameError, passwordError, nicknameError, validateEmail, register } = useAuth()
 
 const handleSubmit = async () => {
     if (await register(form.value)) {
@@ -39,18 +41,69 @@ const handleSubmit = async () => {
                 </div>
 
                 <form @submit.prevent="handleSubmit" class="space-y-4">
-                    <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
-                        <div class="relative">
-                            <UserIcon
-                                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                      text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="text" v-model="form.username" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
+                            <div class="relative">
+                                <UserIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="text" v-model="form.username" required autocomplete="username" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              text-gray-900 dark:text-white
+                                              bg-white dark:bg-gray-700
+                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                              focus:border-transparent
+                                              transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">昵称</label>
+                            <div class="relative">
+                                <IdentificationIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="text" v-model="form.nickname" autocomplete="nickname" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              text-gray-900 dark:text-white
+                                              bg-white dark:bg-gray-700
+                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                              focus:border-transparent
+                                              transition-all duration-200"
+                                    :class="{ 'border-red-500 focus:ring-red-500': nicknameError }">
+                            </div>
+                            <p v-if="nicknameError" class="mt-1 text-sm text-red-500">{{ nicknameError }}</p>
+                        </div>
+
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">密码</label>
+                            <div class="relative">
+                                <LockClosedIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="password" v-model="form.password" required autocomplete="new-password"
+                                    class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              text-gray-900 dark:text-white
+                                              bg-white dark:bg-gray-700
+                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                              focus:border-transparent
+                                              transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">确认密码</label>
+                            <div class="relative">
+                                <ShieldCheckIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="password" v-model="form.confirmPassword" required
+                                    autocomplete="new-password" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              text-gray-900 dark:text-white
+                                              bg-white dark:bg-gray-700
+                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                              focus:border-transparent
+                                              transition-all duration-200">
+                            </div>
                         </div>
                     </div>
 
@@ -59,9 +112,9 @@ const handleSubmit = async () => {
                         <div class="relative">
                             <EnvelopeIcon
                                 class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                      text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
                             <input type="email" v-model="form.email" @blur="() => validateEmail(form.email)" required
-                                class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                autocomplete="email" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
                                           text-gray-900 dark:text-white
                                           bg-white dark:bg-gray-700
                                           focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
@@ -73,41 +126,21 @@ const handleSubmit = async () => {
                     </div>
 
                     <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">密码</label>
-                        <div class="relative">
-                            <LockClosedIcon
-                                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="password" v-model="form.password" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
-                        </div>
-                    </div>
-
-                    <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">确认密码</label>
-                        <div class="relative">
-                            <ShieldCheckIcon
-                                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                            text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="password" v-model="form.confirmPassword" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
-                        </div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">个人简介</label>
+                        <textarea v-model="form.introduction" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                         text-gray-900 dark:text-white
+                                         bg-white dark:bg-gray-700
+                                         focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                         focus:border-transparent
+                                         transition-all duration-200"></textarea>
                     </div>
 
                     <button type="submit" :disabled="isLoading" class="w-full py-2 px-4 bg-[#9affff] hover:bg-[#58e9e9]
-                               text-gray-800 font-medium rounded-md
-                               transform hover:-translate-y-0.5 active:translate-y-0
-                               transition-all duration-200 relative
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               group overflow-hidden">
+                                   text-gray-800 font-medium rounded-md
+                                   transform hover:-translate-y-0.5 active:translate-y-0
+                                   transition-all duration-200 relative
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   group overflow-hidden">
                         <span class="relative z-10 flex items-center justify-center space-x-2">
                             <span>注册</span>
                             <div v-if="isLoading"

@@ -1,4 +1,5 @@
 import instance from "./instance";
+import type { RegisterForm } from "@/types/user";
 
 interface LoginParams {
   username: string;
@@ -11,5 +12,8 @@ export const authApi = {
   },
   logout() {
     return instance.post<never, void>("/auth/logout");
+  },
+  register(data: Omit<RegisterForm, "confirmPassword">) {
+    return instance.post<never, string>("/auth/register", data);
   },
 };

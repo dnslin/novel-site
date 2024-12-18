@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { ApiResponse } from "@/types";
+import { useUserStore } from "@/stores/user";
 
 const instance = axios.create({
   baseURL: "/api",
@@ -27,6 +28,13 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse;
+    if (res.code === 500 && res.message.includes("请登录...")) {
+      // token 失效，清除用户信息
+      const userStore = useUserStore();
+      userStore.clearUser();
+      return Promise.reject(new Error("登录已过期，请重新登录"));
+    }
+
     if (res.code !== 200) {
       return Promise.reject(new Error(res.message || "请求失败"));
     }

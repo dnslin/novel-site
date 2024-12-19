@@ -6,8 +6,8 @@ import { useAuth } from '@/composables/useAuth'
 const emit = defineEmits(['close'])
 
 const form = ref({
-    username: '',
-    password: ''
+    username: 'dnslin',
+    password: 'Catchers.tech123#'
 })
 
 const { isLoading, usernameError, validateUsername, login, requestPasswordReset, emailError } = useAuth()

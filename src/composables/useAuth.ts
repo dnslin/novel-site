@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { authApi } from "@/api/auth";
 import { useUserStore } from "@/stores/user";
 import { useToast } from "vue-toastification";
+import { usePreferencesStore } from "@/stores/preferences";
 
 interface LoginForm {
   username: string;
@@ -91,6 +92,18 @@ export function useAuth() {
       localStorage.setItem("token", token);
       const userStore = useUserStore();
       await userStore.fetchCurrentUser();
+
+      console.log("开始检查偏好设置状态");
+      const preferencesStore = usePreferencesStore();
+      if (preferencesStore) {
+        await preferencesStore.checkPreferencesStatus().catch((err) => {
+          console.error("检查偏好设置失败:", err);
+        });
+      } else {
+        console.error("preferences store 未正确初始化");
+      }
+      console.log("偏好设置状态检查完成");
+
       toast.success("登录成功");
       return true;
     } catch (error: any) {
@@ -131,7 +144,7 @@ export function useAuth() {
       toast.success("注册成功");
       return true;
     } catch (error: any) {
-      toast.error(error.message || "注册失败");
+      toast.error(error.message || "注册账号失败");
       return false;
     } finally {
       isLoading.value = false;

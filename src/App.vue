@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import Header from '@/components/layout/Header.vue'
 import Footer from '@/components/layout/Footer.vue'
+import PreferencesModal from '@/components/preferences/PreferencesModal.vue'
+import { usePreferencesStore } from '@/stores/preferences'
+
+// 确保 store 被初始化
+const preferencesStore = usePreferencesStore()
 </script>
 
 <template>
@@ -18,6 +23,9 @@ import Footer from '@/components/layout/Footer.vue'
 
   <!-- 使用 Footer 组件 -->
   <Footer />
+
+  <!-- 偏好设置模态框组件 -->
+  <PreferencesModal />
 </template>
 
 <style>

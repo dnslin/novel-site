@@ -7,6 +7,7 @@ import type { Book } from '@/types'
 import { useDebounceFn } from '@vueuse/core'
 import { useToast } from 'vue-toastification'
 import { XMarkIcon, MagnifyingGlassIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import HeicImage from '@/components/common/HeicImage.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -212,13 +213,15 @@ onUnmounted(() => {
                     class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     :class="{ 'bg-gray-100 dark:bg-gray-700': selectedIndex === index + searchHistory.length }">
                     <div class="flex items-center space-x-3">
-                        <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName"
-                            class="w-10 h-14 object-cover rounded" />
-                        <div class="flex-1">
-                            <div class="text-gray-900 dark:text-white font-medium">
+                        <div class="w-10 h-14 flex-shrink-0">
+                            <HeicImage v-if="book.coverUrl" :src="book.coverUrl" :alt="book.bookName" class="rounded"
+                                placeholder="/placeholder.jpg" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-gray-900 dark:text-white font-medium truncate">
                                 {{ book.bookName }}
                             </div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                            <div class="text-sm text-gray-500 dark:text-gray-400 truncate">
                                 {{ book.author }}
                             </div>
                         </div>

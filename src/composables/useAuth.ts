@@ -138,6 +138,22 @@ export function useAuth() {
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    if (!validateEmail(email)) return false;
+
+    isLoading.value = true;
+    try {
+      await authApi.requestPasswordReset(email);
+      toast.success("重置邮件已发送，请查收邮箱");
+      return true;
+    } catch (error: any) {
+      toast.error(error.message || "发送重置邮件失败");
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     isLoading,
     emailError,
@@ -150,5 +166,6 @@ export function useAuth() {
     validateNickname,
     login,
     register,
+    requestPasswordReset,
   };
 }

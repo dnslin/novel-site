@@ -16,4 +16,9 @@ export const authApi = {
   register(data: Omit<RegisterForm, "confirmPassword">) {
     return instance.post<never, string>("/auth/register", data);
   },
+  requestPasswordReset(email: string) {
+    return instance.post<never, void>(`/auth/password/reset-request`, null, {
+      params: { email },
+    });
+  },
 };

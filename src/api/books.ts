@@ -1,5 +1,11 @@
 import instance from "./instance";
-import type { Book, BookDetail, BookQuery, PaginatedResponse } from "@/types";
+import type {
+  Book,
+  BookDetail,
+  BookQuery,
+  PaginatedResponse,
+  SearchBookResponse,
+} from "@/types";
 
 export const bookApi = {
   // 获取书籍列表
@@ -28,10 +34,12 @@ export const bookApi = {
     );
   },
 
-  // 添加搜索建议接口
+  // 修改搜索建议接口
   searchSuggestions(keyword: string) {
-    return instance.post<never, PaginatedResponse<Book>>("/books/search", {
+    return instance.post<never, SearchBookResponse>("/books/search", {
       keyword,
+      page: 0,
+      size: 10,
     });
   },
 

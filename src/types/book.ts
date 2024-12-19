@@ -75,3 +75,19 @@ export interface BookCategory {
   name: string;
   parentId?: number;
 }
+
+// 新增搜索响应相关的类型
+export interface SearchBookResponse {
+  content: Book[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  empty: boolean;
+}
+
+export interface BookSearchQuery {
+  keyword: string;
+  page?: number;
+  size?: number;
+}

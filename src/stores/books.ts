@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { ref, computed } from "vue";
 import { bookApi } from "@/api";
 import type { Book } from "@/types";
 
@@ -54,121 +55,121 @@ const SORT_ICONS: Record<string, string> = {
   青春: new URL("@/assets/svg/青春.svg", import.meta.url).href,
 };
 
-interface BookState {
-  latestBooks: Book[];
-  popularBooks: Book[];
-  categories: Array<{
-    name: string;
-    icon: string;
-    id: number;
-  }>;
-  allCategories: Array<{
-    id: number;
-    name: string;
-  }>;
-  loading: boolean;
-  error: string | null;
-  searchSuggestions: Book[];
-}
+export const useBookStore = defineStore(
+  "books",
+  () => {
+    const latestBooks = ref<Book[]>([]);
+    const popularBooks = ref<Book[]>([]);
+    const categories = ref<Array<{ name: string; icon: string; id: number }>>(
+      []
+    );
+    const allCategories = ref<Array<{ id: number; name: string }>>([]);
+    const loading = ref(false);
+    const error = ref<string | null>(null);
+    const searchSuggestions = ref<Book[]>([]);
+    const categoriesLastUpdated = ref(0);
 
-export const useBookStore = defineStore("books", {
-  state: (): BookState => ({
-    latestBooks: [],
-    popularBooks: [],
-    categories: [],
-    allCategories: [],
-    loading: false,
-    error: null,
-    searchSuggestions: [],
-  }),
+    // Getters
+    const hotCategories = computed(() => categories.value.slice(0, 12));
+    const shouldUpdateCategories = computed(() => {
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      return (
+        categories.value.length === 0 ||
+        Date.now() - categoriesLastUpdated.value > ONE_DAY
+      );
+    });
 
-  getters: {
-    // 获取热门分类（展示前12个）
-    hotCategories: (state) => {
-      return state.categories.slice(0, 12);
-    },
-  },
+    // Actions
+    const fetchCategories = async () => {
+      // 如果分类数据未过期，直接返回
+      if (!shouldUpdateCategories.value) {
+        return;
+      }
 
-  actions: {
-    async fetchCategories() {
-      this.loading = true;
-      this.error = null;
+      loading.value = true;
+      error.value = null;
       try {
         const result = await bookApi.getBookSorts();
-        this.allCategories = result;
+        allCategories.value = result;
 
         // 转换为带图标的分类数组
-        this.categories = result.map(
+        categories.value = result.map(
           (category: { id: number; name: string }) => ({
             id: category.id,
             name: category.name,
             icon: SORT_ICONS[category.name] || SORT_ICONS.其他,
           })
         );
+
+        // 更新最后更新时间
+        categoriesLastUpdated.value = Date.now();
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("获取分类失败:", error);
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
-    async searchBooks(keyword: string) {
-      this.loading = true;
-      this.error = null;
+    const searchBooks = async (keyword: string) => {
+      loading.value = true;
+      error.value = null;
       try {
         const data = await bookApi.searchBooks(keyword);
         return data.items;
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("搜索书籍失败:", error);
         return [];
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
-    async getBookDetail(id: number) {
-      this.loading = true;
-      this.error = null;
+    const getBookDetail = async (id: number) => {
+      loading.value = true;
+      error.value = null;
       try {
         const data = await bookApi.getBookDetail(id);
         return data;
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("获取书籍详情失败:", error);
         throw error;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
-    async fetchSearchSuggestions(keyword: string) {
+    const fetchSearchSuggestions = async (keyword: string) => {
       if (!keyword.trim()) {
-        this.searchSuggestions = [];
+        searchSuggestions.value = [];
         return;
       }
 
       try {
         const data = await bookApi.searchSuggestions(keyword);
-        this.searchSuggestions = data.items;
+        searchSuggestions.value = data.content.map((book: Book) => ({
+          ...book,
+          title: book.bookName,
+        }));
       } catch (error: any) {
         console.error("获取搜索建议失败:", error);
-        this.searchSuggestions = [];
+        searchSuggestions.value = [];
       }
-    },
+    };
 
-    async getBooksByCategory(
+    const getBooksByCategory = async (
       categoryId: number,
       page: number = 1,
       pageSize: number = 12
-    ) {
+    ) => {
       if (!categoryId || isNaN(categoryId)) {
         throw new Error("无效的分类ID");
       }
 
-      this.loading = true;
-      this.error = null;
+      loading.value = true;
+      error.value = null;
       try {
         const response = await bookApi.getBooksByCategory(categoryId, {
           page,
@@ -188,67 +189,98 @@ export const useBookStore = defineStore("books", {
           limit: response.size || pageSize,
         };
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("获取分类书籍失败:", error);
         throw error;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
-    async getLatestBooks(page: number, pageSize: number = 6) {
-      this.loading = true;
-      this.error = null;
+    const getLatestBooks = async (page: number, pageSize: number = 6) => {
+      loading.value = true;
+      error.value = null;
       try {
         const result = await bookApi.getLatestBooks(pageSize);
 
-        this.latestBooks = result;
+        latestBooks.value = result;
         return {
           items: result,
           total: result.length,
         };
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("获取最新书籍失败:", error);
-        this.latestBooks = [];
+        latestBooks.value = [];
         throw error;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
-    async getPopularBooks(page: number, pageSize: number = 6) {
-      this.loading = true;
-      this.error = null;
+    const getPopularBooks = async (page: number, pageSize: number = 6) => {
+      loading.value = true;
+      error.value = null;
       try {
         const result = await bookApi.getPopularBooks(pageSize);
 
-        this.popularBooks = result;
+        popularBooks.value = result;
         return {
           items: result,
           total: result.length,
         };
       } catch (error: any) {
-        this.error = error.message;
+        error.value = error.message;
         console.error("获取热门书籍失败:", error);
-        this.popularBooks = [];
+        popularBooks.value = [];
         throw error;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
+    };
 
     // 为了保持兼容性
-    fetchLatestBooks() {
-      return this.getLatestBooks(1, 6);
-    },
+    const fetchLatestBooks = () => getLatestBooks(1, 6);
+    const fetchPopularBooks = () => getPopularBooks(1, 6);
 
-    fetchPopularBooks() {
-      return this.getPopularBooks(1, 6);
-    },
+    const clearSearchSuggestions = () => {
+      searchSuggestions.value = [];
+    };
 
-    clearSearchSuggestions() {
-      this.searchSuggestions = [];
-    },
+    return {
+      // state
+      latestBooks,
+      popularBooks,
+      categories,
+      allCategories,
+      loading,
+      error,
+      searchSuggestions,
+      categoriesLastUpdated,
+      // getters
+      hotCategories,
+      shouldUpdateCategories,
+      // actions
+      fetchCategories,
+      searchBooks,
+      getBookDetail,
+      fetchSearchSuggestions,
+      getBooksByCategory,
+      getLatestBooks,
+      getPopularBooks,
+      fetchLatestBooks,
+      fetchPopularBooks,
+      clearSearchSuggestions,
+    };
   },
-});
+  {
+    persist: {
+      key: "book-store",
+      storage: localStorage,
+      serializer: {
+        deserialize: JSON.parse,
+        serialize: JSON.stringify,
+      },
+    },
+  }
+);

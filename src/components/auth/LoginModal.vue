@@ -10,7 +10,7 @@ const form = ref({
     password: ''
 })
 
-const { isLoading, usernameError, validateUsername, login } = useAuth()
+const { isLoading, usernameError, validateUsername, login, requestPasswordReset, emailError } = useAuth()
 
 // 添加表单验证
 const errors = ref({
@@ -35,8 +35,23 @@ const handleSubmit = async () => {
     }
 }
 
-const handleForgotPassword = () => {
-    console.log('忘记密码')
+const showForgotPasswordForm = ref(false)
+const forgotPasswordEmail = ref('')
+
+const handleForgotPassword = async () => {
+    if (await requestPasswordReset(forgotPasswordEmail.value)) {
+        showForgotPasswordForm.value = false
+        forgotPasswordEmail.value = ''
+    }
+}
+
+const resetForm = () => {
+    showForgotPasswordForm.value = false
+    forgotPasswordEmail.value = ''
+    errors.value = {
+        username: '',
+        password: ''
+    }
 }
 
 // 添加键盘事件处理
@@ -70,78 +85,131 @@ onUnmounted(() => {
             </button>
 
             <div class="p-6 sm:p-8">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">登录</h2>
-                    <div class="h-1 w-20 bg-[#9affff] rounded mt-2 animate-pulse-custom"></div>
-                </div>
-
-                <form @submit.prevent="handleSubmit" class="space-y-4">
-                    <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
-                        <div class="relative">
-                            <EnvelopeIcon
-                                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                          text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input type="text" v-model="form.username" @blur="() => validateUsername(form.username)"
-                                autocomplete="username" :class="{ 'border-red-500 focus:ring-red-500': usernameError }"
-                                required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
-                        </div>
-                        <p v-if="usernameError" class="mt-1 text-sm text-red-500 animate-shake">{{ usernameError }}</p>
+                <!-- 登录表单 -->
+                <template v-if="!showForgotPasswordForm">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">登录</h2>
+                        <div class="h-1 w-20 bg-[#9affff] rounded mt-2 animate-pulse-custom"></div>
                     </div>
 
-                    <div class="relative group">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">密码</label>
-                        <div class="relative">
-                            <LockClosedIcon
-                                class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
-                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                            <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
-                                autocomplete="current-password" class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                       text-gray-900 dark:text-white
-                                       bg-white dark:bg-gray-700
-                                       focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                       focus:border-transparent
-                                       transition-all duration-200">
-                            <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 transform -translate-y-1/2
-                                       text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                                <EyeIcon v-if="!showPassword" class="w-5 h-5" />
-                                <EyeSlashIcon v-else class="w-5 h-5" />
+                    <form @submit.prevent="handleSubmit" class="space-y-4">
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
+                            <div class="relative">
+                                <EnvelopeIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                              text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="text" v-model="form.username" @blur="() => validateUsername(form.username)"
+                                    autocomplete="username"
+                                    :class="{ 'border-red-500 focus:ring-red-500': usernameError }" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                           text-gray-900 dark:text-white
+                                           bg-white dark:bg-gray-700
+                                           focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                           focus:border-transparent
+                                           transition-all duration-200">
+                            </div>
+                            <p v-if="usernameError" class="mt-1 text-sm text-red-500 animate-shake">{{ usernameError }}
+                            </p>
+                        </div>
+
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">密码</label>
+                            <div class="relative">
+                                <LockClosedIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                               text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
+                                    autocomplete="current-password" class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                           text-gray-900 dark:text-white
+                                           bg-white dark:bg-gray-700
+                                           focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                           focus:border-transparent
+                                           transition-all duration-200">
+                                <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 transform -translate-y-1/2
+                                           text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                                    <EyeIcon v-if="!showPassword" class="w-5 h-5" />
+                                    <EyeSlashIcon v-else class="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <button type="button" @click="showForgotPasswordForm = true" class="text-sm text-[#70afaf] hover:text-[#8FF0FC] 
+                                           transition-colors duration-200 group flex items-center space-x-1">
+                                <span>忘记密码？</span>
+                                <ArrowRightIcon
+                                    class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" />
                             </button>
                         </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <button type="button" @click="handleForgotPassword" class="text-sm text-[#70afaf] hover:text-[#8FF0FC] 
-                                   transition-colors duration-200 group flex items-center space-x-1">
-                            <span>忘记密码？</span>
-                            <ArrowRightIcon
-                                class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" />
-                        </button>
-                    </div>
 
 
-                    <button type="submit" :disabled="isLoading" class="w-full py-2 px-4 bg-[#9affff] hover:bg-[#58e9e9]
-                               text-gray-800 font-medium rounded-md
-                               transform hover:-translate-y-0.5 active:translate-y-0
-                               transition-all duration-200 relative
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               group overflow-hidden">
-                        <span class="relative z-10 flex items-center justify-center space-x-2">
-                            <span>登录</span>
-                            <div v-if="isLoading"
-                                class="animate-spin rounded-full h-4 w-4 border-2 border-gray-800 border-t-transparent">
+                        <button type="submit" :disabled="isLoading" class="w-full py-2 px-4 bg-[#9affff] hover:bg-[#58e9e9]
+                                   text-gray-800 font-medium rounded-md
+                                   transform hover:-translate-y-0.5 active:translate-y-0
+                                   transition-all duration-200 relative
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   group overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center space-x-2">
+                                <span>登录</span>
+                                <div v-if="isLoading"
+                                    class="animate-spin rounded-full h-4 w-4 border-2 border-gray-800 border-t-transparent">
+                                </div>
+                            </span>
+                            <div
+                                class="absolute inset-0 h-full w-0 bg-[#58e9e9] transition-all duration-300 group-hover:w-full">
                             </div>
-                        </span>
-                        <div
-                            class="absolute inset-0 h-full w-0 bg-[#58e9e9] transition-all duration-300 group-hover:w-full">
+                        </button>
+                    </form>
+                </template>
+
+                <!-- 忘记密码表单 -->
+                <template v-else>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">重置密码</h2>
+                        <div class="h-1 w-20 bg-[#9affff] rounded mt-2 animate-pulse-custom"></div>
+                    </div>
+
+                    <form @submit.prevent="handleForgotPassword" class="space-y-4">
+                        <div class="relative group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">邮箱地址</label>
+                            <div class="relative">
+                                <EnvelopeIcon
+                                    class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
+                                                    text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
+                                <input type="email" v-model="forgotPasswordEmail" required class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              text-gray-900 dark:text-white
+                                              bg-white dark:bg-gray-700
+                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                              focus:border-transparent
+                                              transition-all duration-200">
+                            </div>
+                            <p v-if="emailError" class="mt-1 text-sm text-red-500 animate-shake">{{ emailError }}</p>
                         </div>
-                    </button>
-                </form>
+
+                        <div class="flex items-center justify-between space-x-4">
+                            <button type="button" @click="resetForm" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300
+                                           transition-colors duration-200">
+                                返回登录
+                            </button>
+                            <button type="submit" :disabled="isLoading" class="flex-1 py-2 px-4 bg-[#9affff] hover:bg-[#58e9e9]
+                                           text-gray-800 font-medium rounded-md
+                                           transform hover:-translate-y-0.5 active:translate-y-0
+                                           transition-all duration-200 relative
+                                           disabled:opacity-50 disabled:cursor-not-allowed
+                                           group overflow-hidden">
+                                <span class="relative z-10 flex items-center justify-center space-x-2">
+                                    <span>发送重置邮件</span>
+                                    <div v-if="isLoading"
+                                        class="animate-spin rounded-full h-4 w-4 border-2 border-gray-800 border-t-transparent">
+                                    </div>
+                                </span>
+                                <div
+                                    class="absolute inset-0 h-full w-0 bg-[#58e9e9] transition-all duration-300 group-hover:w-full">
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </template>
             </div>
         </div>
     </div>

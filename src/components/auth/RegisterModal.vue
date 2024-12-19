@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { XMarkIcon, UserIcon, EnvelopeIcon, LockClosedIcon, ShieldCheckIcon, IdentificationIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon, UserIcon, EnvelopeIcon, LockClosedIcon, ShieldCheckIcon, IdentificationIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import { useAuth } from '@/composables/useAuth'
 
 const emit = defineEmits(['close'])
@@ -14,7 +14,10 @@ const form = ref({
     introduction: '',
 })
 
-const { isLoading, emailError, usernameError, passwordError, nicknameError, validateEmail, register } = useAuth()
+const { isLoading, emailError, nicknameError, passwordError, validateEmail, validatePassword, register } = useAuth()
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const handleSubmit = async () => {
     if (await register(form.value)) {
@@ -80,14 +83,23 @@ const handleSubmit = async () => {
                                 <LockClosedIcon
                                     class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                                <input type="password" v-model="form.password" required autocomplete="new-password"
-                                    class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                              text-gray-900 dark:text-white
-                                              bg-white dark:bg-gray-700
-                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                              focus:border-transparent
-                                              transition-all duration-200">
+                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password" required
+                                    autocomplete="new-password"
+                                    @blur="() => validatePassword(form.password, form.confirmPassword)"
+                                    :class="{ 'border-red-500 focus:ring-red-500': passwordError }" class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          text-gray-900 dark:text-white
+                                          bg-white dark:bg-gray-700
+                                          focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                          focus:border-transparent
+                                          transition-all duration-200">
+                                <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 transform -translate-y-1/2
+                                              text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 
+                                              transition-colors duration-200">
+                                    <EyeIcon v-if="!showPassword" class="w-5 h-5" />
+                                    <EyeSlashIcon v-else class="w-5 h-5" />
+                                </button>
                             </div>
+                            <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
                         </div>
 
                         <div class="relative group">
@@ -96,14 +108,23 @@ const handleSubmit = async () => {
                                 <ShieldCheckIcon
                                     class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 
                                           text-gray-400 group-focus-within:text-[#70afaf] transition-colors duration-200" />
-                                <input type="password" v-model="form.confirmPassword" required
-                                    autocomplete="new-password" class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                                              text-gray-900 dark:text-white
-                                              bg-white dark:bg-gray-700
-                                              focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
-                                              focus:border-transparent
-                                              transition-all duration-200">
+                                <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.confirmPassword"
+                                    required autocomplete="new-password"
+                                    @blur="() => validatePassword(form.password, form.confirmPassword)"
+                                    :class="{ 'border-red-500 focus:ring-red-500': passwordError }" class="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          text-gray-900 dark:text-white
+                                          bg-white dark:bg-gray-700
+                                          focus:ring-2 focus:ring-[#70afaf] dark:focus:ring-[#70afaf]
+                                          focus:border-transparent
+                                          transition-all duration-200">
+                                <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-3 top-1/2 transform -translate-y-1/2
+                                              text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 
+                                              transition-colors duration-200">
+                                    <EyeIcon v-if="!showConfirmPassword" class="w-5 h-5" />
+                                    <EyeSlashIcon v-else class="w-5 h-5" />
+                                </button>
                             </div>
+                            <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
                         </div>
                     </div>
 

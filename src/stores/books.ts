@@ -197,7 +197,7 @@ export const useBookStore = defineStore(
       }
     };
 
-    const getLatestBooks = async (page: number, pageSize: number = 6) => {
+    const getLatestBooks = async (_: number, pageSize: number = 6) => {
       loading.value = true;
       error.value = null;
       try {
@@ -218,7 +218,7 @@ export const useBookStore = defineStore(
       }
     };
 
-    const getPopularBooks = async (page: number, pageSize: number = 6) => {
+    const getPopularBooks = async (_: number, pageSize: number = 6) => {
       loading.value = true;
       error.value = null;
       try {

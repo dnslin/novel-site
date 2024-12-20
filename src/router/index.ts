@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import Profile from "@/views/Profile.vue";
+import Settings from "@/views/Settings.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -52,6 +54,22 @@ const router = createRouter({
       path: "/ranking",
       name: "ranking",
       component: () => import("@/views/Ranking.vue"),
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: Profile,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/settings",
+      name: "Settings",
+      component: Settings,
+      meta: {
+        requiresAuth: true,
+      },
     },
   ],
   scrollBehavior(_to, _from, savedPosition) {

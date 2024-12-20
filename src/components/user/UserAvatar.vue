@@ -85,22 +85,22 @@ onUnmounted(() => {
 
             <!-- 菜单项 -->
             <div class="py-1">
-                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
+                <router-link to="/profile" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
                                   hover:bg-gray-50 dark:hover:bg-gray-700/50
                                   hover:text-primary dark:hover:text-primary-light
                                   transition-colors duration-200 group">
                     <UserCircleIcon class="w-5 h-5 mr-3 text-gray-400 group-hover:text-primary 
                                         dark:group-hover:text-primary-light transition-colors" />
                     <span class="flex-1">个人中心</span>
-                </a>
-                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
+                </router-link>
+                <router-link to="/settings" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 
                                   hover:bg-gray-50 dark:hover:bg-gray-700/50
                                   hover:text-primary dark:hover:text-primary-light
                                   transition-colors duration-200 group">
                     <Cog6ToothIcon class="w-5 h-5 mr-3 text-gray-400 group-hover:text-primary 
                                        dark:group-hover:text-primary-light transition-colors" />
                     <span class="flex-1">设置</span>
-                </a>
+                </router-link>
             </div>
 
             <!-- 登出按钮 -->

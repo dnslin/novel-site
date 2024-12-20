@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { userApi } from "@/api/user";
 import type { User } from "@/types/user";
+import type { UpdateProfileData } from "@/types/profile";
 import { ref, computed } from "vue";
 import { authApi } from "@/api/auth";
 
@@ -45,6 +46,20 @@ export const useUserStore = defineStore(
       }
     }
 
+    const updateProfile = async (data: UpdateProfileData) => {
+      loading.value = true;
+      error.value = null;
+      try {
+        const updatedUser = await userApi.updateProfile(data);
+        currentUser.value = updatedUser;
+      } catch (err: any) {
+        error.value = err.message;
+        throw err;
+      } finally {
+        loading.value = false;
+      }
+    };
+
     return {
       currentUser,
       loading,
@@ -53,6 +68,7 @@ export const useUserStore = defineStore(
       fetchCurrentUser,
       clearUser,
       logout,
+      updateProfile,
     };
   },
   {

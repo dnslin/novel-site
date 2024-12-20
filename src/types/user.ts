@@ -7,6 +7,7 @@ export interface User {
   introduction: string;
   createTime: string;
   roles: string[];
+  preference?: string;
 }
 
 export interface RegisterForm {

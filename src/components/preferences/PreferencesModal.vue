@@ -130,10 +130,14 @@ const mounted = ref(false)
 // 添加控制页面滚动的方法
 const disableBodyScroll = () => {
     document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
 }
 
 const enableBodyScroll = () => {
     document.body.style.overflow = ''
+    document.body.style.position = ''
+    document.body.style.width = ''
 }
 
 // 修改 watch
